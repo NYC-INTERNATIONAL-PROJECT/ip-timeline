@@ -15,10 +15,7 @@
     --bg:#f6f8fb;
     --card:#ffffff;
     --line:#dfe6ef;
-    --ink:#24304;
     --muted:#6b7890;
-    --blue:#3b82f6;
-    --green:#22c55e;
     --orange:#f59e0b;
     --shadow:0 1px 2px rgba(28,42,69,.06), 0 6px 20px rgba(28,42,69,.07);
     --label-w:178px;
@@ -55,7 +52,9 @@
     transition:background .15s, border-color .15s;
   }
   .btn:hover{background:var(--teal-soft); border-color:var(--teal);}
-  .btn:focus-visible, .phase-seg:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+  .btn:disabled{opacity:.45; cursor:default;}
+  .btn:disabled:hover{background:var(--card); border-color:var(--line);}
+  .btn:focus-visible, .tickbtn:focus-visible, .wk:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
   .btn.primary{background:var(--navy); border-color:var(--navy); color:#fff;}
   .btn.primary:hover{background:#2a3b5f;}
   .zoom{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--card);}
@@ -67,34 +66,18 @@
     margin:6px 32px 8px; background:var(--card); border:1px solid var(--line); border-radius:14px;
     box-shadow:var(--shadow); overflow-x:auto; overflow-y:hidden; position:relative;
   }
-  .board{position:relative;}
-
-  /* Phase ribbon: chevron segments encode the sequence */
-  .phase-band{position:relative; height:64px; margin-top:20px;}
-  .phase-seg{
-    position:absolute; top:10px; height:44px; border:0; cursor:pointer;
-    background:#eef2f8; color:var(--navy-soft);
-    font-family:'Archivo',sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
-    display:flex; align-items:center; justify-content:center; gap:8px; padding:0 24px 0 30px;
-    clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
-    transition:background .15s, color .15s;
-    white-space:nowrap; overflow:hidden;
-  }
-  .phase-seg:first-of-type{clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); border-radius:8px 0 0 8px;}
-  .phase-seg:hover{background:var(--teal-soft); color:var(--teal);}
-  .phase-seg.active{background:var(--navy); color:#fff;}
-  .phase-seg .badge{
-    font-family:'Archivo'; font-size:.62rem; background:rgba(28,42,69,.10); border-radius:99px; padding:2px 7px;
-  }
-  .phase-seg.active .badge{background:rgba(255,255,255,.18);}
+  .board{position:relative; padding-top:10px;}
 
   /* Month axis */
-  .axis{position:relative; height:34px; border-bottom:1px solid var(--line);}
+  .axis{position:relative; height:36px; border-bottom:1px solid var(--line);}
   .tick{position:absolute; top:0; height:100%; border-left:1px solid var(--line);}
-  .tick span{
-    position:absolute; top:8px; left:8px; font-size:.68rem; font-weight:600; color:var(--muted); white-space:nowrap;
+  .tickbtn{
+    position:absolute; top:4px; left:4px; font-size:.68rem; font-weight:600; color:var(--muted); white-space:nowrap;
+    background:none; border:0; cursor:pointer; padding:4px 7px; border-radius:6px;
   }
-  .tick.year span{color:var(--navy); font-weight:700;}
+  .tickbtn:hover{color:var(--teal); background:var(--teal-soft);}
+  .tick.year .tickbtn{color:var(--navy); font-weight:700;}
+  .tick.year .tickbtn:hover{color:var(--teal);}
 
   /* Lanes */
   .lanes{position:relative; padding-bottom:22px;}
@@ -112,26 +95,18 @@
   }
   .grid-line{position:absolute; top:0; bottom:0; border-left:1px solid #eef2f7; z-index:0;}
 
-  /* Event pills */
-  .evt{
-    position:absolute; height:27px; display:flex; align-items:center; gap:0;
-    background:#fff; border:1px solid var(--line); border-radius:7px;
-    box-shadow:0 1px 3px rgba(28,42,69,.10);
-    font-size:.72rem; font-weight:600; color:var(--navy);
-    padding:0 10px 0 0; cursor:default; white-space:nowrap; z-index:2;
-    transition:box-shadow .15s, transform .15s;
+  /* Week blocks: one per program per week */
+  .wk{
+    position:absolute; height:24px; border:0; border-radius:6px; cursor:pointer;
+    background:var(--wk-color, var(--navy)); color:#fff;
+    font-size:.68rem; font-weight:600; z-index:2;
+    display:flex; align-items:center; padding:0 7px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    box-shadow:0 1px 3px rgba(28,42,69,.14);
+    transition:transform .15s, box-shadow .15s;
   }
-  .evt:hover{box-shadow:0 3px 10px rgba(28,42,69,.18); transform:translateY(-1px); z-index:6;}
-  .evt::before{
-    content:''; width:4px; align-self:stretch; margin-right:8px; border-radius:7px 0 0 7px;
-    background:var(--evt-color, var(--navy));
-  }
-  .evt.range{
-    color:#fff; border:0; padding-right:12px;
-    background:linear-gradient(0deg, rgba(255,255,255,.08), rgba(255,255,255,.08)), var(--evt-color, var(--navy));
-  }
-  .evt.range::before{background:rgba(255,255,255,.35); margin-right:9px;}
-  .evt .dl{font-size:.62rem; font-weight:700; color:var(--orange); margin-left:6px;}
+  .wk:hover{transform:translateY(-1px); box-shadow:0 3px 10px rgba(28,42,69,.25); z-index:6;}
+  .wk.tiny{justify-content:center; padding:0 2px; font-size:.64rem;}
 
   /* Today marker */
   .today{position:absolute; top:0; bottom:0; width:0; border-left:2px solid var(--teal); z-index:4; pointer-events:none;}
@@ -143,31 +118,39 @@
 
   /* Tooltip */
   .tip{
-    position:fixed; z-index:50; max-width:300px; background:var(--navy); color:#fff;
+    position:fixed; z-index:50; max-width:320px; background:var(--navy); color:#fff;
     border-radius:10px; padding:12px 14px; font-size:.75rem; line-height:1.5;
     box-shadow:0 10px 30px rgba(28,42,69,.35); pointer-events:none; display:none;
   }
-  .tip b{font-size:.82rem; display:block; margin-bottom:3px;}
+  .tip b{font-size:.8rem;}
   .tip .meta{color:#aebadd; font-size:.68rem; margin-bottom:6px;}
-  .tip .notes{color:#dfe6f5;}
+  .tip ul{list-style:none; margin-top:2px;}
+  .tip li{padding:3px 0; border-top:1px solid rgba(255,255,255,.12);}
+  .tip li:first-child{border-top:0;}
+  .tip .staff{color:#8fd8d1; font-size:.68rem;}
 
-  /* Phase checklist panel */
-  .phase-panel{margin:0 32px 8px; display:none;}
-  .phase-panel.open{display:block;}
-  .phase-cards{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:12px;}
-  .phase-card{
-    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow);
+  /* Weekly month view */
+  .month-panel{display:none; margin:10px 32px 8px; background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:18px 20px 20px;}
+  .month-panel.open{display:block;}
+  .mp-head{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .mp-head h2{font-family:'Archivo',sans-serif; font-size:1.05rem; font-weight:800; letter-spacing:-.01em; flex:1; min-width:180px;}
+  .mp-nav{display:flex; gap:6px;}
+  .mp-weeks{display:grid; grid-template-columns:repeat(auto-fit, minmax(216px, 1fr)); gap:12px;}
+  .week{border:1px solid var(--line); border-radius:10px; padding:12px 12px 10px; background:#fbfcfe;}
+  .week.now{border-color:var(--teal); box-shadow:0 0 0 2px rgba(14,148,136,.15);}
+  .week h4{font-family:'Archivo',sans-serif; font-size:.66rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--navy); margin-bottom:8px;}
+  .week h4 .nowtag{color:var(--teal);}
+  .wgroup{margin-top:8px;}
+  .wgroup:first-of-type{margin-top:0;}
+  .wgroup .prog{
+    font-family:'Archivo',sans-serif; font-size:.6rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--prog-color, var(--navy)); margin-bottom:3px;
   }
-  .phase-card h3{
-    font-family:'Archivo',sans-serif; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
-    color:var(--navy); margin-bottom:4px;
-  }
-  .phase-card .range{font-size:.66rem; font-weight:600; color:var(--teal); margin-bottom:10px;}
-  .phase-card ul{list-style:none;}
-  .phase-card li{
-    font-size:.76rem; color:var(--navy-soft); padding:3px 0 3px 16px; position:relative; line-height:1.4;
-  }
-  .phase-card li::before{content:''; position:absolute; left:2px; top:.72em; width:5px; height:5px; border-radius:50%; background:var(--teal);}
+  .witem{display:flex; gap:8px; align-items:flex-start; padding:5px 0; font-size:.74rem; color:var(--navy);}
+  .witem .swatch{width:4px; align-self:stretch; border-radius:4px; background:var(--prog-color,#64748b); flex:none; min-height:18px;}
+  .witem b{display:block; font-weight:600; line-height:1.35;}
+  .witem .wmeta{color:var(--muted); font-size:.66rem; line-height:1.45; display:block; margin-top:1px;}
+  .week .empty{font-size:.7rem; color:var(--muted); padding:4px 0 2px;}
 
   /* Footer / how-to */
   footer{padding:10px 32px 40px; color:var(--muted); font-size:.75rem;}
@@ -184,11 +167,12 @@
 
   .error-note{margin:0 32px 8px; padding:10px 16px; border-radius:10px; background:#fff7ed; border:1px solid #fbd9a5; color:#8a5a10; font-size:.75rem; display:none;}
   .error-note.show{display:block;}
+  .error-note ul{margin:6px 0 8px 18px;}
 
   @media (max-width:640px){
     header{padding:24px 16px 12px;}
     .titleblock h1{font-size:1.4rem;}
-    .board-wrap, .phase-panel, .error-note{margin-left:12px; margin-right:12px;}
+    .board-wrap, .error-note, .month-panel{margin-left:12px; margin-right:12px;}
     footer{padding:10px 16px 32px;}
     :root{--label-w:120px;}
   }
@@ -196,7 +180,7 @@
     *{transition:none !important;}
   }
   @media print{
-    .controls, footer, .phase-panel{display:none !important;}
+    .controls, footer{display:none !important;}
     .board-wrap{overflow:visible; box-shadow:none;}
   }
 </style>
@@ -215,41 +199,59 @@
       <button id="zoomIn" aria-label="Zoom in">+</button>
     </span>
     <button class="btn" id="refreshBtn">Refresh data</button>
-    <button class="btn" id="allPhasesBtn">Phase guide</button>
+    <button class="btn" id="monthViewBtn">This month</button>
     <a class="btn primary" id="openSheet" href="#" target="_blank" rel="noopener">Open sheet</a>
   </div>
 </header>
 
 <div class="error-note" id="errorNote"></div>
 
-<div class="phase-panel" id="phasePanel"><div class="phase-cards" id="phaseCards"></div></div>
-
 <div class="board-wrap" id="boardWrap">
   <div class="board" id="board"></div>
 </div>
+
+<section class="month-panel" id="monthPanel" aria-live="polite">
+  <div class="mp-head">
+    <div class="mp-nav">
+      <button class="btn" id="mpPrev" aria-label="Previous month">←</button>
+      <button class="btn" id="mpNext" aria-label="Next month">→</button>
+    </div>
+    <h2 id="mpTitle"></h2>
+    <button class="btn" id="mpClose">Close</button>
+  </div>
+  <div class="mp-weeks" id="mpWeeks"></div>
+</section>
 
 <footer>
   <details>
     <summary>How this timeline stays up to date</summary>
     <div class="howto">
-      <p>Each time this file is opened, it tries to pull live data from the team Google Sheet. If the sheet
-      can't be reached (offline, tab missing, or sharing turned off), it falls back to the snapshot embedded
-      in this file — so the page always renders.</p>
-      <p style="margin-top:10px"><strong>One-time sheet setup:</strong> in the Google Sheet, add a tab named
-      <code>Timeline</code>, make sure link-sharing is set to “Anyone with the link can view”, and give the tab
-      these column headers in row 1:</p>
+      <p>The page reads your existing monthly tabs directly. Add a row to any month's tab — say, an Equip task
+      in the Aug 10th week — and it appears here on the next load or "Refresh data". Nothing to redeploy.</p>
+
+      <p style="margin-top:10px"><strong>Each monthly tab needs these four columns (header in row 1):</strong></p>
       <table>
-        <tr><th>Track</th><th>Event</th><th>Start Date</th><th>End Date</th><th>Phase</th><th>Notes</th></tr>
-        <tr><td>Internship</td><td>Mid Fundraise Check</td><td>2026-03-01</td><td></td><td>Preparation</td><td>3 months out — 50% raised target</td></tr>
-        <tr><td>Equip</td><td>Equip Intensive Program</td><td>2026-09-01</td><td>2026-09-30</td><td>On Field</td><td>Leave End Date blank for single-point events</td></tr>
+        <tr><th>Week</th><th>Program</th><th>Task</th><th>Staff Responsible</th></tr>
+        <tr><td>Week 2</td><td>Equip</td><td>Mid fundraise check (50% target)</td><td>J. Smith</td></tr>
+        <tr><td>Aug 10</td><td>Internship</td><td>Housing walkthrough</td><td>Ops team</td></tr>
       </table>
-      <p>Dates are flexible: <code>2026-03-01</code>, <code>3/1/2026</code>, or <code>Mar 2026</code> all work.
-      An <em>End Date</em> turns the event into a colored duration bar; leaving it blank shows a point pill.
-      New track names automatically get their own swimlane and color.</p>
-      <p style="margin-top:10px">Use <strong>Copy sheet template</strong> below to copy the current data as
-      tab-separated rows — paste it straight into the new <code>Timeline</code> tab (cell A1) to get started.</p>
+
+      <p><strong>Week</strong> is flexible: <code>Week 2</code>, <code>2</code>, <code>2nd</code>, <code>last</code>,
+      a date like <code>Aug 10</code> / <code>8/10</code>, or phrases like <code>Aug 10th week</code> all land on the
+      right week (weeks run Monday–Sunday, matching the sheet's week labels). Merged or blank <b>Week</b>/<b>Program</b> cells inherit from the row
+      above, so grouped sheet layouts work as-is. New <b>Program</b> names automatically get their own swimlane
+      and color.</p>
+
+      <p style="margin-top:10px"><strong>Which tabs get read</strong> is the <code>CONFIG.monthTabs</code> list at
+      the top of this file's script — each line pairs a tab name with its calendar month. If a tab is renamed, added,
+      or a second year begins (two tabs both called "September"), update that list to match. The sheet itself must
+      stay viewable by "Anyone with the link".</p>
+
+      <p style="margin-top:10px">Setting up a fresh monthly tab? <strong>Copy month template</strong> puts the header
+      row and two example rows on your clipboard — paste into cell A1.</p>
+
       <div class="foot-note">
-        <button class="btn" id="copyTsv">Copy sheet template</button>
+        <button class="btn" id="copyTemplate">Copy month template</button>
         <span>Internal Operations Visual&nbsp;|&nbsp;Confidential</span>
       </div>
     </div>
@@ -264,109 +266,146 @@
    ===================================================================== */
 const CONFIG = {
   sheetId: "1N4MaPS9GyLjoNTq9iHvqOjdurTHTYDHLtyAPthUcP4I",
-  sheetName: "Timeline",   // name of the flat data tab in the sheet
-  gid: null,               // optional: use the tab's gid instead of its name
+
+  /* Which tabs to read, and which calendar month each one represents.
+     "tab" must match the tab name in Google Sheets EXACTLY.
+     Convention: every tab is named "Month Year" — unambiguous even when
+     the cycle spans two Septembers. Extend the list as the cycle grows. */
+  monthTabs: [
+    { tab: "September 2025", month: "2025-09" },
+    { tab: "October 2025",   month: "2025-10" },
+    { tab: "November 2025",  month: "2025-11" },
+    { tab: "December 2025",  month: "2025-12" },
+    { tab: "January 2026",   month: "2026-01" },
+    { tab: "February 2026",  month: "2026-02" },
+    { tab: "March 2026",     month: "2026-03" },
+    { tab: "April 2026",     month: "2026-04" },
+    { tab: "May 2026",       month: "2026-05" },
+    { tab: "June 2026",      month: "2026-06" },
+    { tab: "July 2026",      month: "2026-07" },
+    { tab: "August 2026",    month: "2026-08" },
+    { tab: "September 2026", month: "2026-09" },
+    { tab: "October 2026",   month: "2026-10" },
+    { tab: "November 2026",  month: "2026-11" },
+    { tab: "December 2026",  month: "2026-12" },
+    { tab: "January 2027",   month: "2027-01" },
+  ],
 };
 
-/* Track display order + colors. Tracks found in the sheet but not listed
-   here are appended automatically with colors from EXTRA_COLORS. */
-const TRACKS = [
-  { name: "General Marketing",           color: "#3b82f6" },
-  { name: "Timothy Ambition / Seed Week", color: "#0e9488" },
-  { name: "Internship",                  color: "#22c55e" },
-  { name: "Equip",                       color: "#f59e0b" },
+/* Program display order + colors. Matching is case-insensitive, and
+   programs found in the sheet but not listed here are appended
+   automatically with colors from EXTRA_COLORS. */
+const PROGRAMS = [
+  { name: "General Marketing", color: "#3b82f6" },
+  { name: "Timothy Ambition",  color: "#0e9488" },
+  { name: "Seed Week",         color: "#8b5cf6" },
+  { name: "Internship",        color: "#22c55e" },
+  { name: "Equip",             color: "#f59e0b" },
 ];
 const EXTRA_COLORS = ["#8b5cf6","#ec4899","#06b6d4","#ef4444","#84cc16","#64748b"];
 
-/* Lifecycle phases: ribbon at the top + checklist cards. Edit freely. */
-const PHASES = [
-  { name:"Mobilization", start:"2025-09-01", end:"2025-12-31", items:[
-    "Church outreach","Marketing campaigns","Early Bird promotion","Program awareness"]},
-  { name:"Application", start:"2026-01-01", end:"2026-02-28", items:[
-    "Application submitted","Interviews","Acceptance","Background checks","Housing (Internship)"]},
-  { name:"Preparation", start:"2026-03-01", end:"2026-05-31", items:[
-    "Fundraising / Support Raising","Final Registration","Training Modules","Child Protection",
-    "Partnership Fees","Release Forms","Monthly check-ins"]},
-  { name:"On Field", start:"2026-06-01", end:"2026-08-31", items:[
-    "Program begins","Weekly surveys","Mid-program check-in","Staff support","Statistics reminder","Participant care"]},
-  { name:"Off Field", start:"2026-09-01", end:"2026-10-31", items:[
-    "Program ends","Debrief","Evaluations","Follow-up meetings","Church feedback","Partnership follow-up"]},
-  { name:"Alumni & Re-engagement", start:"2026-11-01", end:"2026-12-31", items:[
-    "Alumni Network","Invite to future programs","Regional Mobilizers","Church referrals",
-    "Recruit next participants","Early Bird begins again"]},
-];
-
 /* =====================================================================
-   FALLBACK SNAPSHOT — used only when the sheet can't be fetched.
-   Columns: Track | Event | Start | End | Phase | Notes
+   FALLBACK SNAPSHOT — used only when no tab can be fetched.
+   Rows per month: [Week, Program, Task, Staff Responsible]
    ===================================================================== */
-const FALLBACK = [
-["General Marketing","Campaign Launch","2025-09-01","","Mobilization","Kick off church outreach and marketing campaigns for the new cycle."],
-["General Marketing","Early Bird Promo","2026-02-01","","Application","Early Bird pricing push before final registration."],
-["General Marketing","Application Push","2026-08-01","","Off Field","Application push for the next cycle while stories are fresh."],
-["General Marketing","Alumni Stories","2026-12-01","","Alumni & Re-engagement","Publish alumni stories; feed recruitment for next year."],
-
-["Timothy Ambition / Seed Week","TA/SW Recruitment","2025-09-01","","Mobilization","Recruitment via churches; invite sending churches to bring a SW/TA."],
-["Timothy Ambition / Seed Week","TA/SW Applications","2026-01-05","","Application","Applications open; interviews and acceptance follow."],
-["Timothy Ambition / Seed Week","TA/SW Training","2026-05-01","","Preparation","Training modules; send reminders to TA/SW staff to keep stats."],
-["Timothy Ambition / Seed Week","TA/SW Program Deployment","2026-09-01","2026-09-30","On Field","Cohort deployment. Quarterly check-ins with Equip continue."],
-["Timothy Ambition / Seed Week","TA/SW Debrief","2026-12-01","","Alumni & Re-engagement","Debrief + evaluations; invite to bring a SW with their church next cycle."],
-
-["Internship","Intern Recruitment","2025-09-01","","Mobilization","Recruitment + intern housing conversations begin."],
-["Internship","Intern Applications","2026-01-05","","Application","Interviews, background checks, Bible test → Equip/Intern director + Kelly 16PF."],
-["Internship","Interviews & Checks","2026-02-01","","Application","Internship lodging confirmations once accepted."],
-["Internship","Mid Fundraise Check","2026-03-01","","Preparation","3 months before program — target ~50% raised."],
-["Internship","Full Payment Due","2026-04-15","","Preparation","April: full payment due (Internship)."],
-["Internship","Housing Setup","2026-05-01","","Preparation","Find a place; connect interns with local Christians early."],
-["Internship","Summer Internship Program","2026-06-15","2026-08-15","On Field","On field. Mid-program check-in; end-of-program debrief 1 week before close."],
-["Internship","Intern Evaluations","2026-12-01","","Alumni & Re-engagement","Send evaluation forms; ask for intern prospects; Mob presents programs."],
-
-["Equip","Equip Promotion","2025-09-01","","Mobilization","Promotion via churches and partners; invite a partner intern/Equipee."],
-["Equip","Equip Applications","2026-01-05","","Application","Applications, interviews, acceptance."],
-["Equip","Mid Fundraise Check","2026-03-01","","Preparation","3 months before — ~50% target; approved support schedule (Equip)."],
-["Equip","Equip Training","2026-05-01","","Preparation","Fundraising / cohort meetings ×3; connect with each other and Christians early."],
-["Equip","Payment Deadline","2026-06-03","","Preparation","Full payment deadline June 3 (Equip)."],
-["Equip","Equip Intensive Program","2026-09-01","2026-09-30","On Field","Intensive program window."],
-["Equip","Equip Follow-up","2026-12-01","","Alumni & Re-engagement","OFF Field debrief ~3 months after; cohort regional Mob invite; alumni network."],
-];
+const FALLBACK = {
+  "2025-09": [
+    ["Week 1","General Marketing","Campaign Launch","Mob team"],
+    ["Week 1","Timothy Ambition","Timothy Ambition Recruitment","Mob team"],
+    ["Week 1","Seed Week","Seed Week Recruitment","Mob team"],
+    ["Week 1","Internship","Intern Recruitment",""],
+    ["Week 1","Equip","Equip Promotion",""],
+  ],
+  "2026-01": [
+    ["Week 1","Timothy Ambition","TA/SW Applications open",""],
+    ["Week 1","Internship","Intern Applications open",""],
+    ["Week 1","Equip","Equip Applications open",""],
+  ],
+  "2026-02": [
+    ["Week 1","General Marketing","Early Bird Promo","Mob team"],
+    ["Week 2","Internship","Interviews & background checks","Directors"],
+  ],
+  "2026-03": [
+    ["Week 1","Internship","Mid fundraise check (50% target)",""],
+    ["Week 1","Equip","Mid fundraise check (50% target)",""],
+  ],
+  "2026-04": [
+    ["Week 3","Internship","Full payment due",""],
+  ],
+  "2026-05": [
+    ["Week 1","Internship","Housing setup",""],
+    ["Week 1","Timothy Ambition","TA/SW Training",""],
+    ["Week 1","Equip","Equip Training",""],
+  ],
+  "2026-06": [
+    ["Jun 3","Equip","Full payment deadline",""],
+    ["Week 3","Internship","Summer program begins","Ops team"],
+  ],
+  "2026-07": [
+    ["Week 2","Internship","Mid-program check-in",""],
+  ],
+  "2026-08": [
+    ["Week 1","General Marketing","Application push for next cycle","Mob team"],
+    ["Aug 10","Equip","Example: date-based week entry",""],
+    ["Week 3","Internship","Program ends + debrief","Ops team"],
+  ],
+};
 
 /* ===================================================================== */
 
 const $ = (id) => document.getElementById(id);
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
 let MW = 110;                 // pixels per month (zoom)
 const LABEL_W = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-w'));
-let events = [];              // normalized {track,name,start,end,phase,notes}
+let tasks = [];               // {program, task, staff, weekStart(Date), monthKey}
 let dataSource = "snapshot";  // "live" | "snapshot"
-let openPhase = null;         // index of open phase card, or "all"
+let tabStats = { ok: 0, total: 0 };
+let monthView = null;         // {y, m} when the weekly month view is open
+let TL = null;                // timeline bounds {t0, t1}
 
-/* ---------- date helpers ---------- */
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-function parseDate(s){
-  if(!s) return null;
-  s = String(s).trim();
-  if(!s) return null;
-  let m;
-  if(m = s.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/))
-    return new Date(+m[1], +m[2]-1, +(m[3]||1));
-  if(m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/))
-    return new Date(+m[3] < 100 ? 2000 + +m[3] : +m[3], +m[1]-1, +m[2]);
-  if(m = s.match(/^(\d{1,2})\/(\d{4})$/))
-    return new Date(+m[2], +m[1]-1, 1);
-  if(m = s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})$/)){
-    const mi = MONTHS.findIndex(x => m[1].toLowerCase().startsWith(x.toLowerCase()));
-    if(mi >= 0) return new Date(+m[3], mi, +m[2]);
-  }
-  if(m = s.match(/^([A-Za-z]{3,9})\.?\s+(\d{4})$/)){
-    const mi = MONTHS.findIndex(x => m[1].toLowerCase().startsWith(x.toLowerCase()));
-    if(mi >= 0) return new Date(+m[2], mi, 1);
-  }
-  const d = new Date(s);
-  return isNaN(d) ? null : d;
+/* ---------- date & week helpers ---------- */
+function monthKeyToDate(k){ const [y, m] = k.split("-").map(Number); return new Date(y, m - 1, 1); }
+function weekStartOf(d){ const w = new Date(d); w.setDate(w.getDate() - ((w.getDay() + 6) % 7)); w.setHours(0,0,0,0); return w; } // weeks run Monday–Sunday, matching the sheet
+function nthWeekOf(y, m, n){
+  if(n >= 90) return weekStartOf(new Date(y, m + 1, 0));         // "last"
+  const w = weekStartOf(new Date(y, m, 1));
+  w.setDate(w.getDate() + (n - 1) * 7);
+  return w;
 }
-function fmt(d){ return d ? `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}` : ""; }
-function monthDiff(a, b){ // fractional months from a to b
-  return (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth())
-       + (b.getDate()-1)/new Date(b.getFullYear(), b.getMonth()+1, 0).getDate();
+function fmtShort(d){ return `${MONTHS[d.getMonth()]} ${d.getDate()}`; }
+
+/* Turn a Week cell into the Sunday that starts that week.
+   Accepts: "Week 2", "2", "2nd", "second", "last", "Aug 10", "Aug 10th week",
+   "8/10", "8/10/2026", "2026-08-10". (y, m) = the tab's calendar month. */
+function parseWeekCell(cell, y, m){
+  if(cell == null) return null;
+  let s = String(cell).trim().toLowerCase();
+  if(!s) return null;
+  s = s.replace(/,/g, " ")
+       .replace(/(\d+)(st|nd|rd|th)\b/g, "$1")
+       .replace(/\bweek\b|\bwk\b|\bof\b/g, " ")
+       .replace(/\s+/g, " ").trim();
+  let mm;
+  if(mm = s.match(/^([a-z]{3,9})\.?(?:\s+(\d{1,2}))?(?:\s+(\d{4}))?$/)){
+    const mi = MONTHS.findIndex(x => mm[1].startsWith(x.toLowerCase()));
+    if(mi >= 0) return weekStartOf(new Date(mm[3] ? +mm[3] : y, mi, mm[2] ? +mm[2] : 1));
+    const words = { first:1, second:2, third:3, fourth:4, fifth:5, last:99 };
+    if(words[mm[1]]) return nthWeekOf(y, m, words[mm[1]]);
+    return null;
+  }
+  if(mm = s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/)){
+    const yy = mm[3] ? (+mm[3] < 100 ? 2000 + +mm[3] : +mm[3]) : y;
+    return weekStartOf(new Date(yy, +mm[1] - 1, +mm[2]));
+  }
+  if(mm = s.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/))
+    return weekStartOf(new Date(+mm[1], +mm[2] - 1, +(mm[3] || 1)));
+  if(mm = s.match(/^(\d{1,2})$/)){
+    const n = +mm[1];
+    return n <= 5 ? nthWeekOf(y, m, n) : weekStartOf(new Date(y, m, n));
+  }
+  return null;
 }
 
 /* ---------- CSV ---------- */
@@ -389,60 +428,112 @@ function parseCSV(text){
   return rows;
 }
 
-function normalizeRows(rows){
+/* Read one monthly tab's rows into task objects.
+   - Finds Week/Program/Task/Staff columns by header; falls back to
+     positional columns A–D if there's no recognizable header row.
+   - Blank Week or Program cells inherit from the row above (merged cells). */
+function normalizeMonthRows(rows, monthKey){
   if(!rows.length) return [];
-  const head = rows[0].map(h => h.toLowerCase().trim());
-  const col = (names) => head.findIndex(h => names.some(n => h === n || h.startsWith(n)));
-  const iT = col(["track","lane","program"]), iE = col(["event","title","name"]),
-        iS = col(["start"]), iEn = col(["end"]), iP = col(["phase"]), iN = col(["note"]);
-  if(iT < 0 || iE < 0 || iS < 0) return []; // not our schema
+  const d0 = monthKeyToDate(monthKey), y = d0.getFullYear(), m = d0.getMonth();
+  // Find the header row anywhere in the first 10 rows (title rows above it are fine).
+  let iW = -1, iP = -1, iT = -1, iS = -1, startRow = 0;
+  for(let r = 0; r < Math.min(rows.length, 10); r++){
+    const head = rows[r].map(h => (h || "").toLowerCase().trim());
+    const col = (names) => head.findIndex(h => names.some(n => h === n || h.startsWith(n)));
+    const w = col(["week"]), p = col(["program","track"]), t = col(["task","event","item","activity"]);
+    if(w >= 0 && (p >= 0 || t >= 0)){
+      iW = w; iP = p >= 0 ? p : w + 1; iT = t >= 0 ? t : w + 2;
+      iS = col(["staff","responsible","owner","who","assigned"]);
+      startRow = r + 1;
+      break;
+    }
+  }
+  if(iW < 0){ iW = 0; iP = 1; iT = 2; iS = 3; startRow = 0; } // headerless tab: assume columns A–D
   const out = [];
-  for(let r = 1; r < rows.length; r++){
+  let lastWeek = null, lastProg = "";
+  for(let r = startRow; r < rows.length; r++){
     const row = rows[r];
-    const start = parseDate(row[iS]);
-    if(!row[iT] || !row[iE] || !start) continue;
-    out.push({
-      track: row[iT].trim(),
-      name: row[iE].trim(),
-      start,
-      end: iEn >= 0 ? parseDate(row[iEn]) : null,
-      phase: iP >= 0 ? (row[iP]||"").trim() : "",
-      notes: iN >= 0 ? (row[iN]||"").trim() : "",
+    const task = (row[iT] || "").trim();
+    if(!task) continue;
+    const wsCell = (row[iW] || "").trim();
+    const ws = wsCell ? parseWeekCell(wsCell, y, m) : lastWeek;
+    const prog = (row[iP] || "").trim() || lastProg;
+    if(!ws || !prog) continue;
+    lastWeek = ws; lastProg = prog;
+    out.push({ program: canonicalProgram(prog), task, staff: iS >= 0 ? (row[iS] || "").trim() : "", weekStart: ws, monthKey });
+  }
+  return out;
+}
+
+function canonicalProgram(name){
+  const hit = PROGRAMS.find(p => p.name.toLowerCase() === name.toLowerCase());
+  return hit ? hit.name : name;
+}
+
+function fallbackTasks(){
+  const out = [];
+  for(const [key, rows] of Object.entries(FALLBACK)){
+    const d0 = monthKeyToDate(key), y = d0.getFullYear(), m = d0.getMonth();
+    rows.forEach(r => {
+      const ws = parseWeekCell(r[0], y, m);
+      if(ws) out.push({ program: r[1], task: r[2], staff: r[3] || "", weekStart: ws, monthKey: key });
     });
   }
   return out;
 }
 
-function fallbackEvents(){
-  return FALLBACK.map(r => ({
-    track:r[0], name:r[1], start:parseDate(r[2]), end:parseDate(r[3]), phase:r[4], notes:r[5]
-  })).filter(e => e.start);
+/* ---------- data loading: one fetch per monthly tab ---------- */
+async function fetchCSVRows(url){
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 9000);
+  try{
+    // credentials:"omit" = anonymous request, like an incognito visitor.
+    const res = await fetch(url, { signal: ctl.signal, cache: "no-store", credentials: "omit" });
+    clearTimeout(timer);
+    if(!res.ok) return { err: `HTTP ${res.status}` };
+    const text = await res.text();
+    if(text.trim().startsWith("<"))
+      return { err: "got a sign-in page — sheet not viewable by “Anyone with the link”, or tab name doesn't exist" };
+    return { rows: parseCSV(text) };
+  } catch(e){
+    clearTimeout(timer);
+    return { err: e.name === "AbortError" ? "timed out" : "blocked before reaching Google (network/CORS)" };
+  }
 }
 
-/* ---------- data loading ---------- */
 async function loadData(){
   setStatus("loading");
-  const base = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv`;
-  const url = base + (CONFIG.gid != null ? `&gid=${CONFIG.gid}` : `&sheet=${encodeURIComponent(CONFIG.sheetName)}`);
-  try{
-    const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), 9000);
-    const res = await fetch(url, { signal: ctl.signal });
-    clearTimeout(timer);
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    if(text.trim().startsWith("<")) throw new Error("Sheet is not shared publicly or tab not found");
-    const parsed = normalizeRows(parseCSV(text));
-    if(!parsed.length) throw new Error(`No usable rows in the “${CONFIG.sheetName}” tab (check the column headers)`);
-    events = parsed;
+  const base = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=`;
+  const results = await Promise.all(CONFIG.monthTabs.map(async (t) => {
+    const r = await fetchCSVRows(base + encodeURIComponent(t.tab));
+    if(r.err) return { tab: t.tab, err: r.err };
+    return { tab: t.tab, tasks: normalizeMonthRows(r.rows, t.month) };
+  }));
+
+  const loaded = results.filter(r => r.tasks);
+  const failed = results.filter(r => r.err);
+  tabStats = { ok: loaded.length, total: CONFIG.monthTabs.length };
+  const note = $("errorNote");
+
+  if(loaded.length){
+    tasks = loaded.flatMap(r => r.tasks);
     dataSource = "live";
-    $("errorNote").classList.remove("show");
-  } catch(err){
-    events = fallbackEvents();
+    if(failed.length){
+      note.innerHTML = `<strong>${failed.length} tab${failed.length > 1 ? "s" : ""} couldn't be read:</strong>` +
+        `<ul>${failed.map(f => `<li>“${f.tab}”: ${f.err}</li>`).join("")}</ul>` +
+        `Check that each tab name in <code>CONFIG.monthTabs</code> matches the sheet exactly (spaces and capitalization count).`;
+      note.classList.add("show");
+    } else note.classList.remove("show");
+  } else {
+    tasks = fallbackTasks();
     dataSource = "snapshot";
-    const note = $("errorNote");
-    note.textContent = `Couldn't load live data from the Google Sheet (${err.message}). Showing the snapshot embedded in this file instead. ` +
-      `To go live: add a “${CONFIG.sheetName}” tab with the schema described under “How this timeline stays up to date”, and set sharing to “Anyone with the link can view”.`;
+    note.innerHTML = `<strong>No monthly tabs could be loaded — showing the embedded snapshot.</strong>` +
+      `<ul>${failed.map(f => `<li>“${f.tab}”: ${f.err}</li>`).join("")}</ul>` +
+      (location.protocol === "file:" ?
+        `<strong>You're opening this file straight from your computer (file://)</strong> — most browsers block Google ` +
+        `requests from local files. Open the GitHub Pages URL instead; the sheet connection works there. ` : "") +
+      `Other common fixes: sharing must be “Anyone with the link – Viewer” (this page fetches anonymously, without your ` +
+      `Google login), and tab names in <code>CONFIG.monthTabs</code> must match the sheet exactly.`;
     note.classList.add("show");
   }
   setStatus(dataSource);
@@ -453,53 +544,45 @@ function setStatus(state){
   const chip = $("statusChip"), txt = $("statusText");
   chip.className = "chip";
   if(state === "loading"){ txt.textContent = "Loading…"; return; }
-  const t = new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
-  if(state === "live"){ chip.classList.add("live"); txt.textContent = `Live from Google Sheets · ${t}`; }
-  else { chip.classList.add("snapshot"); txt.textContent = `Embedded snapshot · ${t}`; }
+  const t = new Date().toLocaleTimeString([], { hour:"numeric", minute:"2-digit" });
+  if(state === "live"){
+    chip.classList.add("live");
+    txt.textContent = `Live · ${tabStats.ok}/${tabStats.total} month tabs · ${t}`;
+  } else {
+    chip.classList.add("snapshot");
+    txt.textContent = `Embedded snapshot · ${t}`;
+  }
 }
 
 /* ---------- rendering ---------- */
-function trackList(){
-  const known = TRACKS.map(t => t.name);
-  const seen = [...new Set(events.map(e => e.track))];
-  const list = TRACKS.filter(t => seen.includes(t.name))
+function programList(){
+  const known = PROGRAMS.map(p => p.name);
+  const seen = [...new Set(tasks.map(e => e.program))];
+  return PROGRAMS.filter(p => seen.includes(p.name))
     .concat(seen.filter(n => !known.includes(n))
-    .map((n, i) => ({ name:n, color: EXTRA_COLORS[i % EXTRA_COLORS.length] })));
-  return list;
+    .map((n, i) => ({ name: n, color: EXTRA_COLORS[i % EXTRA_COLORS.length] })));
+}
+function programColors(){
+  return Object.fromEntries(programList().map(p => [p.name, p.color]));
+}
+function monthDiff(a, b){ // fractional months from a to b
+  return (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth())
+       + (b.getDate()-1)/new Date(b.getFullYear(), b.getMonth()+1, 0).getDate();
 }
 
 function render(){
   const board = $("board");
   board.innerHTML = "";
-  if(!events.length){ board.innerHTML = "<p style='padding:40px'>No events to show.</p>"; return; }
 
-  // Timeline bounds: snap to month start/end across events + phases
-  const dates = events.flatMap(e => [e.start, e.end || e.start])
-    .concat(PHASES.flatMap(p => [parseDate(p.start), parseDate(p.end)])).filter(Boolean);
-  const min = new Date(Math.min(...dates)), max = new Date(Math.max(...dates));
-  const t0 = new Date(min.getFullYear(), min.getMonth(), 1);
-  const t1 = new Date(max.getFullYear(), max.getMonth() + 1, 1);
+  // Bounds come from CONFIG.monthTabs so empty months still show.
+  const monthDates = CONFIG.monthTabs.map(t => monthKeyToDate(t.month));
+  const t0 = new Date(Math.min(...monthDates));
+  const tLastStart = new Date(Math.max(...monthDates));
+  const t1 = new Date(tLastStart.getFullYear(), tLastStart.getMonth() + 1, 1);
+  TL = { t0, t1 };
   const nMonths = (t1.getFullYear()-t0.getFullYear())*12 + (t1.getMonth()-t0.getMonth());
   const X = (d) => LABEL_W() + monthDiff(t0, d) * MW;
-  const totalW = LABEL_W() + nMonths * MW + 40;
-  board.style.width = totalW + "px";
-
-  /* Phase ribbon */
-  const band = document.createElement("div");
-  band.className = "phase-band";
-  PHASES.forEach((p, i) => {
-    const s = parseDate(p.start), e = parseDate(p.end);
-    if(!s || !e) return;
-    const seg = document.createElement("button");
-    seg.className = "phase-seg" + (openPhase === i ? " active" : "");
-    seg.style.left = X(s) + "px";
-    seg.style.width = Math.max(60, X(e) - X(s)) + "px";
-    seg.innerHTML = `<span>${p.name}</span><span class="badge">${p.items.length}</span>`;
-    seg.title = `${p.name} — click for checklist`;
-    seg.addEventListener("click", () => togglePhase(i));
-    band.appendChild(seg);
-  });
-  board.appendChild(band);
+  board.style.width = (LABEL_W() + nMonths * MW + 40) + "px";
 
   /* Month axis */
   const axis = document.createElement("div");
@@ -509,39 +592,54 @@ function render(){
     const tick = document.createElement("div");
     tick.className = "tick" + (d.getMonth() === 0 || i === 0 ? " year" : "");
     tick.style.left = X(d) + "px";
-    tick.innerHTML = `<span>${MONTHS[d.getMonth()]}${(d.getMonth() === 0 || i === 0) ? " " + d.getFullYear() : ""}</span>`;
+    const mb = document.createElement("button");
+    mb.className = "tickbtn";
+    mb.textContent = `${MONTHS[d.getMonth()]}${(d.getMonth() === 0 || i === 0) ? " " + d.getFullYear() : ""}`;
+    mb.title = "Click for the week-by-week breakdown of this month";
+    mb.addEventListener("click", () => openMonth(d.getFullYear(), d.getMonth()));
+    tick.appendChild(mb);
     axis.appendChild(tick);
   }
   board.appendChild(axis);
 
+  /* Group tasks: one block per program per week */
+  const groups = new Map(); // "program|time" -> {program, weekStart, items[]}
+  tasks.forEach(e => {
+    const k = e.program + "|" + e.weekStart.getTime();
+    if(!groups.has(k)) groups.set(k, { program: e.program, weekStart: e.weekStart, monthKey: e.monthKey, items: [] });
+    groups.get(k).items.push(e);
+  });
+
   /* Lanes */
   const lanes = document.createElement("div");
   lanes.className = "lanes";
-  const ROW_H = 37, PAD_T = 12, PAD_B = 14;
+  const ROW_H = 33, PAD_T = 12, PAD_B = 14;
 
-  trackList().forEach(tr => {
-    const laneEvents = events.filter(e => e.track === tr.name)
-      .sort((a,b) => a.start - b.start);
+  programList().forEach(pr => {
+    const laneGroups = [...groups.values()].filter(g => g.program === pr.name)
+      .sort((a, b) => a.weekStart - b.weekStart);
 
-    // assign sub-rows to avoid overlaps (estimate pill width from label length)
+    // sub-row stacking for overlapping weeks (adjacent weeks never overlap,
+    // but two Week cells can resolve to the same Sunday only via same key,
+    // so overlap is rare; keep it safe anyway)
     const sub = [];
-    laneEvents.forEach(e => {
-      const x1 = X(e.start);
-      const w = e.end ? Math.max(X(e.end) - x1, 90) : Math.max(7.2 * e.name.length + 34, 70);
-      e._x = x1; e._w = w;
+    laneGroups.forEach(g => {
+      const wEnd = new Date(g.weekStart); wEnd.setDate(wEnd.getDate() + 7);
+      const x1 = Math.max(X(g.weekStart), LABEL_W());
+      const x2 = Math.min(X(wEnd), X(t1));
+      g._x = x1; g._w = Math.max(x2 - x1 - 3, 14);
       let r = 0;
-      while(sub[r] !== undefined && sub[r] > x1 - 8) r++;
-      sub[r] = x1 + w;
-      e._row = r;
+      while(sub[r] !== undefined && sub[r] > x1 + 1) r++;
+      sub[r] = x1 + g._w;
+      g._row = r;
     });
     const rows = Math.max(sub.length, 1);
 
     const lane = document.createElement("div");
     lane.className = "lane";
     lane.style.height = (PAD_T + rows * ROW_H + PAD_B) + "px";
-    lane.style.setProperty("--lane-color", tr.color);
+    lane.style.setProperty("--lane-color", pr.color);
 
-    // month grid lines
     for(let i = 0; i <= nMonths; i++){
       const g = document.createElement("div");
       g.className = "grid-line";
@@ -551,19 +649,29 @@ function render(){
 
     const label = document.createElement("div");
     label.className = "lane-label";
-    label.innerHTML = `<b>${tr.name}</b>`;
+    label.innerHTML = `<b>${pr.name}</b>`;
     lane.appendChild(label);
 
-    laneEvents.forEach(e => {
-      const el = document.createElement("div");
-      el.className = "evt" + (e.end ? " range" : "");
-      el.style.setProperty("--evt-color", tr.color);
-      el.style.left = e._x + "px";
-      el.style.top = (PAD_T + e._row * ROW_H) + "px";
-      if(e.end) el.style.width = e._w + "px";
-      el.textContent = e.name;
-      el.addEventListener("mousemove", (ev) => showTip(ev, e, tr.color));
+    laneGroups.forEach(g => {
+      const el = document.createElement("button");
+      el.className = "wk";
+      el.style.setProperty("--wk-color", pr.color);
+      el.style.left = g._x + "px";
+      el.style.top = (PAD_T + g._row * ROW_H) + "px";
+      el.style.width = g._w + "px";
+      if(g._w >= 84){
+        el.textContent = g.items.length === 1 ? g.items[0].task : `${g.items[0].task} +${g.items.length - 1}`;
+      } else {
+        el.classList.add("tiny");
+        el.textContent = g.items.length > 1 ? g.items.length : "";
+      }
+      el.setAttribute("aria-label", `${pr.name}, week of ${fmtShort(g.weekStart)}: ${g.items.length} task${g.items.length>1?"s":""}`);
+      el.addEventListener("mousemove", (ev) => showTip(ev, g, pr.color));
       el.addEventListener("mouseleave", hideTip);
+      el.addEventListener("click", () => {
+        const d = monthKeyToDate(g.monthKey);
+        openMonth(d.getFullYear(), d.getMonth());
+      });
       lane.appendChild(el);
     });
     lanes.appendChild(lane);
@@ -577,42 +685,87 @@ function render(){
     today.className = "today";
     today.style.left = X(now) + "px";
     today.innerHTML = "<em>Today</em>";
-    lanes.style.position = "relative";
     lanes.appendChild(today);
   }
 
-  renderPhasePanel();
+  renderMonthView();
 }
 
-/* ---------- phase checklist panel ---------- */
-function togglePhase(i){
-  openPhase = (openPhase === i) ? null : i;
-  render();
-  if(openPhase !== null) $("phasePanel").scrollIntoView({ behavior:"smooth", block:"nearest" });
+/* ---------- weekly month view ---------- */
+function openMonth(y, m){
+  monthView = { y, m };
+  renderMonthView();
+  $("monthPanel").scrollIntoView({ behavior:"smooth", block:"nearest" });
 }
-function renderPhasePanel(){
-  const panel = $("phasePanel"), cards = $("phaseCards");
-  cards.innerHTML = "";
-  const list = openPhase === "all" ? PHASES.map((_, i) => i) : (openPhase === null ? [] : [openPhase]);
-  list.forEach(i => {
-    const p = PHASES[i];
-    const c = document.createElement("div");
-    c.className = "phase-card";
-    c.innerHTML = `<h3>${p.name}</h3>
-      <div class="range">${fmt(parseDate(p.start))} → ${fmt(parseDate(p.end))}</div>
-      <ul>${p.items.map(x => `<li>${x}</li>`).join("")}</ul>`;
-    cards.appendChild(c);
-  });
-  panel.classList.toggle("open", list.length > 0);
+function shiftMonth(delta){
+  if(!monthView || !TL) return;
+  const d = new Date(monthView.y, monthView.m + delta, 1);
+  if(d < TL.t0 || d >= TL.t1) return;
+  monthView = { y: d.getFullYear(), m: d.getMonth() };
+  renderMonthView();
+}
+function renderMonthView(){
+  const panel = $("monthPanel");
+  if(!monthView){ panel.classList.remove("open"); return; }
+  panel.classList.add("open");
+  const { y, m } = monthView;
+  $("mpTitle").textContent = `${MONTHS_FULL[m]} ${y} — week by week`;
+  $("mpPrev").disabled = TL && new Date(y, m - 1, 1) < TL.t0;
+  $("mpNext").disabled = TL && new Date(y, m + 1, 1) >= TL.t1;
+
+  const first = new Date(y, m, 1), last = new Date(y, m + 1, 0);
+  const colors = programColors();
+  const order = programList().map(p => p.name);
+  const nowWs = weekStartOf(new Date()).getTime();
+  const wrap = $("mpWeeks");
+  wrap.innerHTML = "";
+
+  let ws = weekStartOf(first);
+  let wi = 1;
+  while(ws <= last){
+    const we = new Date(ws); we.setDate(we.getDate() + 6);
+    const col = document.createElement("div");
+    col.className = "week" + (ws.getTime() === nowWs ? " now" : "");
+    col.innerHTML = `<h4>Week ${wi} · ${fmtShort(ws)} – ${fmtShort(we)}` +
+      (ws.getTime() === nowWs ? ` <span class="nowtag">← this week</span>` : "") + `</h4>`;
+
+    const hits = tasks.filter(e => e.weekStart.getTime() === ws.getTime());
+    if(!hits.length){
+      col.innerHTML += `<div class="empty">Nothing scheduled</div>`;
+    } else {
+      const byProg = new Map();
+      hits.forEach(e => {
+        if(!byProg.has(e.program)) byProg.set(e.program, []);
+        byProg.get(e.program).push(e);
+      });
+      [...byProg.keys()].sort((a, b) => order.indexOf(a) - order.indexOf(b)).forEach(prog => {
+        const grp = document.createElement("div");
+        grp.className = "wgroup";
+        grp.style.setProperty("--prog-color", colors[prog] || "#64748b");
+        grp.innerHTML = `<div class="prog">${prog}</div>`;
+        byProg.get(prog).forEach(e => {
+          const div = document.createElement("div");
+          div.className = "witem";
+          div.innerHTML = `<span class="swatch"></span><span><b>${e.task}</b>` +
+            (e.staff ? `<span class="wmeta">${e.staff}</span>` : "") + `</span>`;
+          grp.appendChild(div);
+        });
+        col.appendChild(grp);
+      });
+    }
+    wrap.appendChild(col);
+    ws = new Date(ws); ws.setDate(ws.getDate() + 7);
+    wi++;
+  }
 }
 
 /* ---------- tooltip ---------- */
-function showTip(ev, e, color){
+function showTip(ev, g, color){
   const tip = $("tip");
-  const dates = e.end ? `${fmt(e.start)} → ${fmt(e.end)}` : fmt(e.start);
-  tip.innerHTML = `<b>${e.name}</b>
-    <div class="meta">${e.track}${e.phase ? " · " + e.phase : ""}<br>${dates}</div>
-    ${e.notes ? `<div class="notes">${e.notes}</div>` : ""}`;
+  const we = new Date(g.weekStart); we.setDate(we.getDate() + 6);
+  tip.innerHTML = `<b>${g.program}</b>` +
+    `<div class="meta">Week of ${fmtShort(g.weekStart)} – ${fmtShort(we)}</div>` +
+    `<ul>${g.items.map(e => `<li>${e.task}${e.staff ? ` <span class="staff">· ${e.staff}</span>` : ""}</li>`).join("")}</ul>`;
   tip.style.display = "block";
   const w = tip.offsetWidth, h = tip.offsetHeight;
   let x = ev.clientX + 14, y = ev.clientY + 14;
@@ -624,29 +777,31 @@ function hideTip(){ $("tip").style.display = "none"; }
 
 /* ---------- controls ---------- */
 $("refreshBtn").addEventListener("click", loadData);
-$("zoomIn").addEventListener("click", () => { MW = Math.min(MW + 20, 240); render(); });
+$("zoomIn").addEventListener("click", () => { MW = Math.min(MW + 20, 260); render(); });
 $("zoomOut").addEventListener("click", () => { MW = Math.max(MW - 20, 60); render(); });
-$("allPhasesBtn").addEventListener("click", () => {
-  openPhase = (openPhase === "all") ? null : "all";
-  render();
+$("mpPrev").addEventListener("click", () => shiftMonth(-1));
+$("mpNext").addEventListener("click", () => shiftMonth(1));
+$("mpClose").addEventListener("click", () => { monthView = null; renderMonthView(); });
+$("monthViewBtn").addEventListener("click", () => {
+  if(!TL) return;
+  const now = new Date();
+  const inRange = now >= TL.t0 && now < TL.t1;
+  openMonth(inRange ? now.getFullYear() : TL.t0.getFullYear(),
+            inRange ? now.getMonth()    : TL.t0.getMonth());
 });
 $("openSheet").href = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/edit`;
-$("copyTsv").addEventListener("click", async (ev) => {
-  const head = "Track\tEvent\tStart Date\tEnd Date\tPhase\tNotes";
-  const body = events.map(e =>
-    [e.track, e.name,
-     `${e.start.getFullYear()}-${String(e.start.getMonth()+1).padStart(2,"0")}-${String(e.start.getDate()).padStart(2,"0")}`,
-     e.end ? `${e.end.getFullYear()}-${String(e.end.getMonth()+1).padStart(2,"0")}-${String(e.end.getDate()).padStart(2,"0")}` : "",
-     e.phase, e.notes].join("\t")).join("\n");
-  const tsv = head + "\n" + body;
-  try{ await navigator.clipboard.writeText(tsv); ev.target.textContent = "Copied — paste into cell A1"; }
+$("copyTemplate").addEventListener("click", async (ev) => {
+  const tsv = "Week\tProgram\tTask\tStaff Responsible\n" +
+              "Week 1\tGeneral Marketing\tExample task\t\n" +
+              "Aug 10\tEquip\tExample: a date lands on that week\t";
+  try{ await navigator.clipboard.writeText(tsv); }
   catch{
     const ta = document.createElement("textarea");
     ta.value = tsv; document.body.appendChild(ta); ta.select();
     document.execCommand("copy"); ta.remove();
-    ev.target.textContent = "Copied — paste into cell A1";
   }
-  setTimeout(() => ev.target.textContent = "Copy sheet template", 2600);
+  ev.target.textContent = "Copied — paste into cell A1";
+  setTimeout(() => ev.target.textContent = "Copy month template", 2600);
 });
 
 loadData();
