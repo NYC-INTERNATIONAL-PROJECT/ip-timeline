@@ -57,6 +57,10 @@
   .btn:focus-visible, .tickbtn:focus-visible, .wk:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
   .btn.primary{background:var(--navy); border-color:var(--navy); color:#fff;}
   .btn.primary:hover{background:#2a3b5f;}
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--card);}
+  .seg button{border:0; background:none; padding:7px 12px; font-size:.78rem; font-weight:600; color:var(--navy); cursor:pointer;}
+  .seg button.active{background:var(--navy); color:#fff;}
+  .seg button:not(.active):hover{background:var(--teal-soft);}
   .zoom{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--card);}
   .zoom button{border:0; background:none; padding:7px 11px; font-size:.9rem; font-weight:700; color:var(--navy); cursor:pointer;}
   .zoom button:hover{background:var(--teal-soft);}
@@ -109,6 +113,72 @@
   .wk.tiny{justify-content:center; padding:0 2px; font-size:.64rem;}
 
   /* Today marker */
+  /* Executive view: collapsible lifecycle ribbon (chevron segments) */
+  .pband{position:relative; height:62px;}
+  .phase-seg{
+    position:absolute; top:9px; height:44px; border:0; cursor:pointer;
+    background:#eef2f8; color:var(--navy-soft);
+    font-family:'Archivo',sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
+    display:flex; align-items:center; justify-content:center; gap:8px; padding:0 24px 0 30px;
+    clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
+    transition:background .15s, color .15s;
+    white-space:nowrap; overflow:hidden;
+  }
+  .phase-seg.first{clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); border-radius:8px 0 0 8px;}
+  .phase-seg:hover{background:var(--teal-soft); color:var(--teal);}
+  .phase-seg.active{background:var(--navy); color:#fff;}
+  .phase-seg .badge{
+    font-family:'Archivo',sans-serif; font-size:.62rem; background:rgba(28,42,69,.10); border-radius:99px; padding:2px 7px;
+  }
+  .phase-seg.active .badge{background:rgba(255,255,255,.18);}
+  .phase-seg:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+  /* Phase checklist card (opens above the board when a segment is clicked) */
+  .phase-panel{display:none; margin:0 32px 8px;}
+  .phase-panel.open{display:block;}
+  .phase-card{
+    display:inline-block; min-width:250px; max-width:360px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:16px 20px; box-shadow:var(--shadow);
+  }
+  .phase-card h3{
+    font-family:'Archivo',sans-serif; font-size:.74rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--navy); margin-bottom:4px;
+  }
+  .phase-card .range{font-size:.68rem; font-weight:600; color:var(--teal); margin-bottom:10px;}
+  .phase-card ul{list-style:none;}
+  .phase-card li{
+    font-size:.76rem; color:var(--navy-soft); padding:3px 0 3px 15px; position:relative; line-height:1.4;
+  }
+  .phase-card li::before{content:''; position:absolute; left:1px; top:.72em; width:5px; height:5px; border-radius:50%; background:var(--teal);}
+
+  /* Executive milestone pills (mockup-style labeled pills) */
+  .mst{
+    position:absolute; height:27px; display:flex; align-items:center;
+    background:#fff; border:1px solid var(--line); border-radius:7px;
+    box-shadow:0 1px 3px rgba(28,42,69,.12);
+    font-size:.71rem; font-weight:600; color:var(--navy);
+    padding:0 10px 0 0; cursor:pointer; white-space:nowrap; z-index:2;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .mst::before{
+    content:''; width:4px; align-self:stretch; margin-right:8px; border-radius:7px 0 0 7px;
+    background:var(--wk-color, var(--navy));
+  }
+  .mst:hover{transform:translateY(-1px); box-shadow:0 3px 10px rgba(28,42,69,.22); z-index:6;}
+
+  /* Executive fallback: one merged bar per program per active stretch */
+  .exbar{
+    position:absolute; height:28px; border:0; border-radius:8px; cursor:pointer;
+    background:linear-gradient(0deg, rgba(255,255,255,.12), rgba(255,255,255,.12)), var(--wk-color, var(--navy));
+    color:#fff; font-size:.7rem; font-weight:700; letter-spacing:.02em;
+    display:flex; align-items:center; justify-content:center; padding:0 10px;
+    white-space:nowrap; overflow:hidden; z-index:2;
+    box-shadow:0 1px 3px rgba(28,42,69,.14);
+    transition:transform .15s, box-shadow .15s;
+  }
+  .exbar:hover{transform:translateY(-1px); box-shadow:0 3px 10px rgba(28,42,69,.25); z-index:6;}
+
   .today{position:absolute; top:0; bottom:0; width:0; border-left:2px solid var(--teal); z-index:4; pointer-events:none;}
   .today em{
     position:absolute; top:2px; left:-2px; transform:translateX(-50%);
@@ -172,7 +242,7 @@
   @media (max-width:640px){
     header{padding:24px 16px 12px;}
     .titleblock h1{font-size:1.4rem;}
-    .board-wrap, .error-note, .month-panel{margin-left:12px; margin-right:12px;}
+    .board-wrap, .error-note, .month-panel, .phase-panel{margin-left:12px; margin-right:12px;}
     footer{padding:10px 16px 32px;}
     :root{--label-w:120px;}
   }
@@ -190,10 +260,14 @@
 <header>
   <div class="titleblock">
     <h1>IP Mobilization Journey</h1>
-    <div class="sub">2025 – 2026 Operational Lifecycle</div>
+    <div class="sub" id="subTitle">2025 – 2026 Operational Lifecycle</div>
   </div>
   <div class="controls">
     <span id="statusChip" class="chip"><span class="dot"></span><span id="statusText">Loading…</span></span>
+    <span class="seg" role="group" aria-label="View level">
+      <button id="viewExec">Executive</button>
+      <button id="viewDetail" class="active">Detailed</button>
+    </span>
     <span class="zoom" title="Zoom timeline">
       <button id="zoomOut" aria-label="Zoom out">−</button>
       <button id="zoomIn" aria-label="Zoom in">+</button>
@@ -205,6 +279,8 @@
 </header>
 
 <div class="error-note" id="errorNote"></div>
+
+<div class="phase-panel" id="phasePanel"><div class="phase-card" id="phaseCard"></div></div>
 
 <div class="board-wrap" id="boardWrap">
   <div class="board" id="board"></div>
@@ -242,10 +318,19 @@
       above, so grouped sheet layouts work as-is. New <b>Program</b> names automatically get their own swimlane
       and color.</p>
 
-      <p style="margin-top:10px"><strong>Which tabs get read</strong> is the <code>CONFIG.monthTabs</code> list at
-      the top of this file's script — each line pairs a tab name with its calendar month. If a tab is renamed, added,
-      or a second year begins (two tabs both called "September"), update that list to match. The sheet itself must
+      <p style="margin-top:10px"><strong>Which tabs get read:</strong> every month from
+      <code>CONFIG.range.start</code> to <code>CONFIG.range.end</code>, each expected as a tab named
+      "Month Year" (e.g. <code>March 2026</code>). To extend the cycle, create the new tabs in the sheet and move
+      <code>end</code> forward — that one date is the only yearly maintenance. Programs listed in
+      <code>IGNORED_PROGRAMS</code> are hidden; <code>PROGRAM_ALIASES</code> merges name variants. The sheet must
       stay viewable by "Anyone with the link".</p>
+
+      <p style="margin-top:10px"><strong>Views:</strong> Detailed shows one block per program per week. Executive is
+      the general overview: the lifecycle ribbon (click a phase to open its checklist) plus each program's key milestones as
+      labeled pills. Mark a task as a milestone by starting it with <code>*</code> (e.g. <code>*Campaign Launch</code>) or by
+      putting any value in an optional <b>Milestone</b> column. The <code>*</code> never shows on the page. If nothing
+      is marked yet, Executive shows one bar per program per active stretch with its task count instead. The phase
+      names, positions, and checklists are the <code>EXEC_PHASES</code> block at the top of this file's script.</p>
 
       <p style="margin-top:10px">Setting up a fresh monthly tab? <strong>Copy month template</strong> puts the header
       row and two example rows on your clipboard — paste into cell A1.</p>
@@ -267,30 +352,43 @@
 const CONFIG = {
   sheetId: "1N4MaPS9GyLjoNTq9iHvqOjdurTHTYDHLtyAPthUcP4I",
 
-  /* Which tabs to read, and which calendar month each one represents.
-     "tab" must match the tab name in Google Sheets EXACTLY.
-     Convention: every tab is named "Month Year" — unambiguous even when
-     the cycle spans two Septembers. Extend the list as the cycle grows. */
-  monthTabs: [
-    { tab: "September 2025", month: "2025-09" },
-    { tab: "October 2025",   month: "2025-10" },
-    { tab: "November 2025",  month: "2025-11" },
-    { tab: "December 2025",  month: "2025-12" },
-    { tab: "January 2026",   month: "2026-01" },
-    { tab: "February 2026",  month: "2026-02" },
-    { tab: "March 2026",     month: "2026-03" },
-    { tab: "April 2026",     month: "2026-04" },
-    { tab: "May 2026",       month: "2026-05" },
-    { tab: "June 2026",      month: "2026-06" },
-    { tab: "July 2026",      month: "2026-07" },
-    { tab: "August 2026",    month: "2026-08" },
-    { tab: "September 2026", month: "2026-09" },
-    { tab: "October 2026",   month: "2026-10" },
-    { tab: "November 2026",  month: "2026-11" },
-    { tab: "December 2026",  month: "2026-12" },
-    { tab: "January 2027",   month: "2027-01" },
-  ],
+  /* The months the timeline covers. Tabs are expected to be named
+     "Month Year" (e.g. "September 2025"). To extend the cycle: create the
+     new tabs in the sheet and move "end" forward — that's the only change
+     this file ever needs year over year. */
+  range: { start: "2025-09", end: "2027-01" },
+
+  /* Rare exceptions: if one tab's name can't follow the convention,
+     map it here, e.g. { "2026-03": "March (rev2)" } */
+  tabOverrides: {},
 };
+
+/* Programs hidden from the timeline entirely (case-insensitive).
+   To merge one into another instead, use PROGRAM_ALIASES below. */
+const IGNORED_PROGRAMS = ["General"];
+
+/* Optional renames applied while reading, e.g. { "Gen Marketing": "General Marketing" } */
+const PROGRAM_ALIASES = {};
+
+/* Lifecycle phases shown in the Executive view: name, the month the phase
+   begins (its node position on the line), and its checklist card. These are
+   stable year to year, so they live here rather than in the sheet. */
+const EXEC_PHASES = [
+  { name:"Mobilization", start:"2025-09", end:"2025-12", items:[
+    "Church outreach","Marketing campaigns","Early Bird promotion","Program awareness"]},
+  { name:"Application", start:"2026-01", end:"2026-02", items:[
+    "Application submitted","Interviews","Acceptance","Background checks","Housing (Internship)"]},
+  { name:"Preparation", start:"2026-03", end:"2026-05", items:[
+    "Fundraising / Support Raising","Final Registration","Training Modules","Child Protection",
+    "Partnership Fees","Release Forms","Monthly check-ins"]},
+  { name:"On Field", start:"2026-06", end:"2026-08", items:[
+    "Program begins","Weekly surveys","Mid-program check-in","Staff support","Statistics reminder","Participant care"]},
+  { name:"Off Field", start:"2026-09", end:"2026-10", items:[
+    "Program ends","Debrief","Evaluations","Follow-up meetings","Church feedback","Partnership follow-up"]},
+  { name:"Alumni & Re-engagement", start:"2026-11", end:"2027-01", items:[
+    "Alumni Network","Invite to future programs","Regional Mobilizers","Church referrals",
+    "Recruit next participants","Early Bird begins again"]},
+];
 
 /* Program display order + colors. Matching is case-insensitive, and
    programs found in the sheet but not listed here are appended
@@ -310,7 +408,7 @@ const EXTRA_COLORS = ["#8b5cf6","#ec4899","#06b6d4","#ef4444","#84cc16","#64748b
    ===================================================================== */
 const FALLBACK = {
   "2025-09": [
-    ["Week 1","General Marketing","Campaign Launch","Mob team"],
+    ["Week 1","General Marketing","*Campaign Launch","Mob team"],
     ["Week 1","Timothy Ambition","Timothy Ambition Recruitment","Mob team"],
     ["Week 1","Seed Week","Seed Week Recruitment","Mob team"],
     ["Week 1","Internship","Intern Recruitment",""],
@@ -322,7 +420,7 @@ const FALLBACK = {
     ["Week 1","Equip","Equip Applications open",""],
   ],
   "2026-02": [
-    ["Week 1","General Marketing","Early Bird Promo","Mob team"],
+    ["Week 1","General Marketing","*Early Bird Promo","Mob team"],
     ["Week 2","Internship","Interviews & background checks","Directors"],
   ],
   "2026-03": [
@@ -338,16 +436,16 @@ const FALLBACK = {
     ["Week 1","Equip","Equip Training",""],
   ],
   "2026-06": [
-    ["Jun 3","Equip","Full payment deadline",""],
-    ["Week 3","Internship","Summer program begins","Ops team"],
+    ["Jun 3","Equip","*Full payment deadline",""],
+    ["Week 3","Internship","*Summer program begins","Ops team"],
   ],
   "2026-07": [
     ["Week 2","Internship","Mid-program check-in",""],
   ],
   "2026-08": [
-    ["Week 1","General Marketing","Application push for next cycle","Mob team"],
+    ["Week 1","General Marketing","*Application push for next cycle","Mob team"],
     ["Aug 10","Equip","Example: date-based week entry",""],
-    ["Week 3","Internship","Program ends + debrief","Ops team"],
+    ["Week 3","Internship","*Program ends + debrief","Ops team"],
   ],
 };
 
@@ -358,6 +456,8 @@ const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov
 const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 let MW = 110;                 // pixels per month (zoom)
+let view = "detailed";        // "detailed" (weekly blocks) | "executive" (overview)
+let openPhase = null;         // index of the open phase checklist (executive view)
 const LABEL_W = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-w'));
 let tasks = [];               // {program, task, staff, weekStart(Date), monthKey}
 let dataSource = "snapshot";  // "live" | "snapshot"
@@ -367,6 +467,17 @@ let TL = null;                // timeline bounds {t0, t1}
 
 /* ---------- date & week helpers ---------- */
 function monthKeyToDate(k){ const [y, m] = k.split("-").map(Number); return new Date(y, m - 1, 1); }
+function monthTabs(){
+  const out = [];
+  let [y, m] = CONFIG.range.start.split("-").map(Number);
+  const [ey, em] = CONFIG.range.end.split("-").map(Number);
+  while(y < ey || (y === ey && m <= em)){
+    const key = `${y}-${String(m).padStart(2, "0")}`;
+    out.push({ tab: CONFIG.tabOverrides[key] || `${MONTHS_FULL[m - 1]} ${y}`, month: key });
+    m++; if(m > 12){ m = 1; y++; }
+  }
+  return out;
+}
 function weekStartOf(d){ const w = new Date(d); w.setDate(w.getDate() - ((w.getDay() + 6) % 7)); w.setHours(0,0,0,0); return w; } // weeks run Monday–Sunday, matching the sheet
 function nthWeekOf(y, m, n){
   if(n >= 90) return weekStartOf(new Date(y, m + 1, 0));         // "last"
@@ -436,7 +547,7 @@ function normalizeMonthRows(rows, monthKey){
   if(!rows.length) return [];
   const d0 = monthKeyToDate(monthKey), y = d0.getFullYear(), m = d0.getMonth();
   // Find the header row anywhere in the first 10 rows (title rows above it are fine).
-  let iW = -1, iP = -1, iT = -1, iS = -1, startRow = 0;
+  let iW = -1, iP = -1, iT = -1, iS = -1, iM = -1, startRow = 0;
   for(let r = 0; r < Math.min(rows.length, 10); r++){
     const head = rows[r].map(h => (h || "").toLowerCase().trim());
     const col = (names) => head.findIndex(h => names.some(n => h === n || h.startsWith(n)));
@@ -444,6 +555,7 @@ function normalizeMonthRows(rows, monthKey){
     if(w >= 0 && (p >= 0 || t >= 0)){
       iW = w; iP = p >= 0 ? p : w + 1; iT = t >= 0 ? t : w + 2;
       iS = col(["staff","responsible","owner","who","assigned"]);
+      iM = col(["milestone","key","major","highlight"]);
       startRow = r + 1;
       break;
     }
@@ -460,12 +572,20 @@ function normalizeMonthRows(rows, monthKey){
     const prog = (row[iP] || "").trim() || lastProg;
     if(!ws || !prog) continue;
     lastWeek = ws; lastProg = prog;
-    out.push({ program: canonicalProgram(prog), task, staff: iS >= 0 ? (row[iS] || "").trim() : "", weekStart: ws, monthKey });
+    if(IGNORED_PROGRAMS.some(n => n.toLowerCase() === prog.toLowerCase())) continue;
+    // A task is a milestone (shown in the Executive view) if it starts with *
+    // or the optional Milestone column has any value.
+    const starred = /^[*\u2605\u2606]\s*/.test(task);
+    const milestone = starred || (iM >= 0 && (row[iM] || "").trim() !== "");
+    out.push({ program: canonicalProgram(prog), task: task.replace(/^[*\u2605\u2606]\s*/, ""),
+               staff: iS >= 0 ? (row[iS] || "").trim() : "", weekStart: ws, monthKey, milestone });
   }
   return out;
 }
 
 function canonicalProgram(name){
+  const alias = Object.keys(PROGRAM_ALIASES).find(k => k.toLowerCase() === name.toLowerCase());
+  if(alias) name = PROGRAM_ALIASES[alias];
   const hit = PROGRAMS.find(p => p.name.toLowerCase() === name.toLowerCase());
   return hit ? hit.name : name;
 }
@@ -476,7 +596,9 @@ function fallbackTasks(){
     const d0 = monthKeyToDate(key), y = d0.getFullYear(), m = d0.getMonth();
     rows.forEach(r => {
       const ws = parseWeekCell(r[0], y, m);
-      if(ws) out.push({ program: r[1], task: r[2], staff: r[3] || "", weekStart: ws, monthKey: key });
+      const starred = /^\*\s*/.test(r[2]);
+      if(ws) out.push({ program: r[1], task: r[2].replace(/^\*\s*/, ""), staff: r[3] || "",
+                        weekStart: ws, monthKey: key, milestone: starred });
     });
   }
   return out;
@@ -504,7 +626,8 @@ async function fetchCSVRows(url){
 async function loadData(){
   setStatus("loading");
   const base = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=`;
-  const results = await Promise.all(CONFIG.monthTabs.map(async (t) => {
+  const tabs = monthTabs();
+  const results = await Promise.all(tabs.map(async (t) => {
     const r = await fetchCSVRows(base + encodeURIComponent(t.tab));
     if(r.err) return { tab: t.tab, err: r.err };
     return { tab: t.tab, tasks: normalizeMonthRows(r.rows, t.month) };
@@ -512,7 +635,7 @@ async function loadData(){
 
   const loaded = results.filter(r => r.tasks);
   const failed = results.filter(r => r.err);
-  tabStats = { ok: loaded.length, total: CONFIG.monthTabs.length };
+  tabStats = { ok: loaded.length, total: tabs.length };
   const note = $("errorNote");
 
   if(loaded.length){
@@ -521,7 +644,8 @@ async function loadData(){
     if(failed.length){
       note.innerHTML = `<strong>${failed.length} tab${failed.length > 1 ? "s" : ""} couldn't be read:</strong>` +
         `<ul>${failed.map(f => `<li>“${f.tab}”: ${f.err}</li>`).join("")}</ul>` +
-        `Check that each tab name in <code>CONFIG.monthTabs</code> matches the sheet exactly (spaces and capitalization count).`;
+        `Each tab must be named exactly “Month Year” (e.g. <code>March 2026</code>) — watch for extra spaces. ` +
+      `One-off names can be mapped in <code>CONFIG.tabOverrides</code>.`;
       note.classList.add("show");
     } else note.classList.remove("show");
   } else {
@@ -533,7 +657,7 @@ async function loadData(){
         `<strong>You're opening this file straight from your computer (file://)</strong> — most browsers block Google ` +
         `requests from local files. Open the GitHub Pages URL instead; the sheet connection works there. ` : "") +
       `Other common fixes: sharing must be “Anyone with the link – Viewer” (this page fetches anonymously, without your ` +
-      `Google login), and tab names in <code>CONFIG.monthTabs</code> must match the sheet exactly.`;
+      `Google login), and each tab must be named exactly “Month Year” (e.g. <code>March 2026</code>).`;
     note.classList.add("show");
   }
   setStatus(dataSource);
@@ -574,8 +698,8 @@ function render(){
   const board = $("board");
   board.innerHTML = "";
 
-  // Bounds come from CONFIG.monthTabs so empty months still show.
-  const monthDates = CONFIG.monthTabs.map(t => monthKeyToDate(t.month));
+  // Bounds come from CONFIG.range so empty months still show.
+  const monthDates = monthTabs().map(t => monthKeyToDate(t.month));
   const t0 = new Date(Math.min(...monthDates));
   const tLastStart = new Date(Math.max(...monthDates));
   const t1 = new Date(tLastStart.getFullYear(), tLastStart.getMonth() + 1, 1);
@@ -583,6 +707,9 @@ function render(){
   const nMonths = (t1.getFullYear()-t0.getFullYear())*12 + (t1.getMonth()-t0.getMonth());
   const X = (d) => LABEL_W() + monthDiff(t0, d) * MW;
   board.style.width = (LABEL_W() + nMonths * MW + 40) + "px";
+
+  /* Executive view: lifecycle phase band with checklist cards (mockup style) */
+  if(view === "executive") board.appendChild(buildPhaseBand(t0, t1, nMonths, X));
 
   /* Month axis */
   const axis = document.createElement("div");
@@ -602,7 +729,46 @@ function render(){
   }
   board.appendChild(axis);
 
-  /* Group tasks: one block per program per week */
+  const lanes = (view === "executive")
+    ? buildExecutiveLanes(t0, t1, nMonths, X)
+    : buildDetailedLanes(t0, t1, nMonths, X);
+  board.appendChild(lanes);
+
+  /* Today marker */
+  const now = new Date();
+  if(now >= t0 && now <= t1){
+    const today = document.createElement("div");
+    today.className = "today";
+    today.style.left = X(now) + "px";
+    today.innerHTML = "<em>Today</em>";
+    lanes.appendChild(today);
+  }
+
+  renderPhasePanel();
+  renderMonthView();
+}
+
+/* Shared per-lane chrome: grid lines + sticky label */
+function laneShell(pr, height, nMonths){
+  const lane = document.createElement("div");
+  lane.className = "lane";
+  lane.style.height = height + "px";
+  lane.style.setProperty("--lane-color", pr.color);
+  for(let i = 0; i <= nMonths; i++){
+    const g = document.createElement("div");
+    g.className = "grid-line";
+    g.style.left = (LABEL_W() + i * MW) + "px";
+    lane.appendChild(g);
+  }
+  const label = document.createElement("div");
+  label.className = "lane-label";
+  label.innerHTML = `<b>${pr.name}</b>`;
+  lane.appendChild(label);
+  return lane;
+}
+
+/* Detailed view: one block per program per week */
+function buildDetailedLanes(t0, t1, nMonths, X){
   const groups = new Map(); // "program|time" -> {program, weekStart, items[]}
   tasks.forEach(e => {
     const k = e.program + "|" + e.weekStart.getTime();
@@ -610,7 +776,6 @@ function render(){
     groups.get(k).items.push(e);
   });
 
-  /* Lanes */
   const lanes = document.createElement("div");
   lanes.className = "lanes";
   const ROW_H = 33, PAD_T = 12, PAD_B = 14;
@@ -619,9 +784,6 @@ function render(){
     const laneGroups = [...groups.values()].filter(g => g.program === pr.name)
       .sort((a, b) => a.weekStart - b.weekStart);
 
-    // sub-row stacking for overlapping weeks (adjacent weeks never overlap,
-    // but two Week cells can resolve to the same Sunday only via same key,
-    // so overlap is rare; keep it safe anyway)
     const sub = [];
     laneGroups.forEach(g => {
       const wEnd = new Date(g.weekStart); wEnd.setDate(wEnd.getDate() + 7);
@@ -634,23 +796,7 @@ function render(){
       g._row = r;
     });
     const rows = Math.max(sub.length, 1);
-
-    const lane = document.createElement("div");
-    lane.className = "lane";
-    lane.style.height = (PAD_T + rows * ROW_H + PAD_B) + "px";
-    lane.style.setProperty("--lane-color", pr.color);
-
-    for(let i = 0; i <= nMonths; i++){
-      const g = document.createElement("div");
-      g.className = "grid-line";
-      g.style.left = (LABEL_W() + i * MW) + "px";
-      lane.appendChild(g);
-    }
-
-    const label = document.createElement("div");
-    label.className = "lane-label";
-    label.innerHTML = `<b>${pr.name}</b>`;
-    lane.appendChild(label);
+    const lane = laneShell(pr, PAD_T + rows * ROW_H + PAD_B, nMonths);
 
     laneGroups.forEach(g => {
       const el = document.createElement("button");
@@ -676,19 +822,158 @@ function render(){
     });
     lanes.appendChild(lane);
   });
-  board.appendChild(lanes);
+  return lanes;
+}
 
-  /* Today marker */
-  const now = new Date();
-  if(now >= t0 && now <= t1){
-    const today = document.createElement("div");
-    today.className = "today";
-    today.style.left = X(now) + "px";
-    today.innerHTML = "<em>Today</em>";
-    lanes.appendChild(today);
-  }
+/* Executive phase band: collapsible chevron ribbon; click a phase for its checklist */
+function buildPhaseBand(t0, t1, nMonths, X){
+  const band = document.createElement("div");
+  band.className = "pband";
+  EXEC_PHASES.forEach((p, i) => {
+    let s = monthKeyToDate(p.start);
+    let eEnd = monthKeyToDate(p.end);
+    let e = new Date(eEnd.getFullYear(), eEnd.getMonth() + 1, 1); // end month inclusive
+    if(e <= t0 || s >= t1) return;                                 // outside range
+    if(s < t0) s = t0;
+    if(e > t1) e = t1;
+    const seg = document.createElement("button");
+    seg.className = "phase-seg" + (i === 0 ? " first" : "") + (openPhase === i ? " active" : "");
+    seg.style.left = X(s) + "px";
+    seg.style.width = Math.max(X(e) - X(s), 64) + "px";
+    seg.innerHTML = `<span>${p.name}</span><span class="badge">${p.items.length}</span>`;
+    seg.title = `${p.name} — click for checklist`;
+    seg.addEventListener("click", () => togglePhase(i));
+    band.appendChild(seg);
+  });
+  return band;
+}
+function togglePhase(i){
+  openPhase = (openPhase === i) ? null : i;
+  render();
+}
+function renderPhasePanel(){
+  const panel = $("phasePanel");
+  if(view !== "executive" || openPhase === null){ panel.classList.remove("open"); return; }
+  const p = EXEC_PHASES[openPhase];
+  const s = monthKeyToDate(p.start), e = monthKeyToDate(p.end);
+  $("phaseCard").innerHTML = `<h3>${p.name}</h3>` +
+    `<div class="range">${MONTHS[s.getMonth()]} ${s.getFullYear()} \u2192 ${MONTHS[e.getMonth()]} ${e.getFullYear()}</div>` +
+    `<ul>${p.items.map(x => `<li>${x}</li>`).join("")}</ul>`;
+  panel.classList.add("open");
+}
 
-  renderMonthView();
+/* Executive lanes: labeled milestone pills (tasks marked with * or a
+   Milestone column). Falls back to merged count bars if nothing is marked. */
+function buildExecutiveLanes(t0, t1, nMonths, X){
+  const milestones = tasks.filter(e => e.milestone);
+  if(!milestones.length) return buildExecCountLanes(t0, t1, nMonths, X);
+
+  const lanes = document.createElement("div");
+  lanes.className = "lanes";
+  const ROW_H = 34, PAD_T = 13, PAD_B = 15;
+
+  programList().forEach(pr => {
+    const list = milestones.filter(e => e.program === pr.name)
+      .sort((a, b) => a.weekStart - b.weekStart);
+
+    const sub = [];
+    list.forEach(e => {
+      const x1 = Math.max(X(e.weekStart), LABEL_W());
+      const w = Math.max(7.2 * e.task.length + 34, 70);
+      e._x = x1; e._w = w;
+      let r = 0;
+      while(sub[r] !== undefined && sub[r] > x1 - 8) r++;
+      sub[r] = x1 + w;
+      e._row = r;
+    });
+    const rows = Math.max(sub.length, 1);
+    const lane = laneShell(pr, PAD_T + rows * ROW_H + PAD_B, nMonths);
+
+    list.forEach(e => {
+      const el = document.createElement("button");
+      el.className = "mst";
+      el.style.setProperty("--wk-color", pr.color);
+      el.style.left = e._x + "px";
+      el.style.top = (PAD_T + e._row * ROW_H) + "px";
+      el.textContent = e.task;
+      el.setAttribute("aria-label", `${pr.name} milestone, week of ${fmtShort(e.weekStart)}: ${e.task}`);
+      el.addEventListener("mousemove", (ev) => showTip(ev, { program: pr.name, weekStart: e.weekStart, items: [e] }, pr.color));
+      el.addEventListener("mouseleave", hideTip);
+      el.addEventListener("click", () => {
+        const d = monthKeyToDate(e.monthKey);
+        openMonth(d.getFullYear(), d.getMonth());
+      });
+      lane.appendChild(el);
+    });
+    lanes.appendChild(lane);
+  });
+  return lanes;
+}
+
+/* Executive fallback: contiguous active months merge into one bar per program */
+function buildExecCountLanes(t0, t1, nMonths, X){
+  const lanes = document.createElement("div");
+  lanes.className = "lanes";
+  const PAD_T = 14, ROW_H = 34, PAD_B = 16;
+
+  programList().forEach(pr => {
+    const counts = new Array(nMonths).fill(0);
+    tasks.filter(e => e.program === pr.name).forEach(e => {
+      const d = monthKeyToDate(e.monthKey);
+      const idx = (d.getFullYear() - t0.getFullYear()) * 12 + (d.getMonth() - t0.getMonth());
+      if(idx >= 0 && idx < nMonths) counts[idx]++;
+    });
+
+    const spans = [];
+    for(let i = 0; i < nMonths; i++){
+      if(!counts[i]) continue;
+      const prev = spans[spans.length - 1];
+      if(prev && prev.end === i - 1){ prev.end = i; prev.total += counts[i]; }
+      else spans.push({ start: i, end: i, total: counts[i] });
+    }
+
+    const lane = laneShell(pr, PAD_T + ROW_H + PAD_B, nMonths);
+    spans.forEach(s => {
+      const x1 = LABEL_W() + s.start * MW, x2 = LABEL_W() + (s.end + 1) * MW;
+      const el = document.createElement("button");
+      el.className = "exbar";
+      el.style.setProperty("--wk-color", pr.color);
+      el.style.left = (x1 + 2) + "px";
+      el.style.top = PAD_T + "px";
+      el.style.width = (x2 - x1 - 7) + "px";
+      if(x2 - x1 >= 74) el.textContent = `${s.total} task${s.total > 1 ? "s" : ""}`;
+      el.setAttribute("aria-label", `${pr.name}: ${s.total} tasks between ${monthLabel(t0, s.start)} and ${monthLabel(t0, s.end)}`);
+      el.addEventListener("mousemove", (ev) => showExecTip(ev, pr, s, counts, t0));
+      el.addEventListener("mouseleave", hideTip);
+      el.addEventListener("click", (ev) => {
+        const rect = ev.currentTarget.getBoundingClientRect();
+        const idx = Math.min(s.end, Math.max(s.start, s.start + Math.floor((ev.clientX - rect.left) / MW)));
+        const d = new Date(t0.getFullYear(), t0.getMonth() + idx, 1);
+        openMonth(d.getFullYear(), d.getMonth());
+      });
+      lane.appendChild(el);
+    });
+    lanes.appendChild(lane);
+  });
+  return lanes;
+}
+function monthLabel(t0, idx){
+  const d = new Date(t0.getFullYear(), t0.getMonth() + idx, 1);
+  return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+function showExecTip(ev, pr, s, counts, t0){
+  const tip = $("tip");
+  const range = s.start === s.end ? monthLabel(t0, s.start) : `${monthLabel(t0, s.start)} – ${monthLabel(t0, s.end)}`;
+  let items = "";
+  for(let i = s.start; i <= s.end; i++)
+    items += `<li>${monthLabel(t0, i)} — ${counts[i]} task${counts[i] > 1 ? "s" : ""}</li>`;
+  tip.innerHTML = `<b>${pr.name}</b><div class="meta">${range} · ${s.total} task${s.total > 1 ? "s" : ""} · click a month to drill in</div><ul>${items}</ul>`;
+  tip.style.display = "block";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if(x + w > innerWidth - 10) x = ev.clientX - w - 14;
+  if(y + h > innerHeight - 10) y = ev.clientY - h - 14;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
 }
 
 /* ---------- weekly month view ---------- */
@@ -776,6 +1061,15 @@ function showTip(ev, g, color){
 function hideTip(){ $("tip").style.display = "none"; }
 
 /* ---------- controls ---------- */
+$("subTitle").textContent = `${CONFIG.range.start.split("-")[0]} – ${CONFIG.range.end.split("-")[0]} Operational Lifecycle`;
+function setView(v){
+  view = v;
+  $("viewExec").classList.toggle("active", v === "executive");
+  $("viewDetail").classList.toggle("active", v === "detailed");
+  render();
+}
+$("viewExec").addEventListener("click", () => setView("executive"));
+$("viewDetail").addEventListener("click", () => setView("detailed"));
 $("refreshBtn").addEventListener("click", loadData);
 $("zoomIn").addEventListener("click", () => { MW = Math.min(MW + 20, 260); render(); });
 $("zoomOut").addEventListener("click", () => { MW = Math.max(MW - 20, 60); render(); });
