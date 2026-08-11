@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP Mobilization Journey · 2025–2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --navy:#1c2a45;
+    --navy-soft:#3d4c6b;
+    --teal:#0e9488;
+    --teal-soft:#e2f4f2;
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --line:#dfe6ef;
+    --ink:#24304;
+    --muted:#6b7890;
+    --blue:#3b82f6;
+    --green:#22c55e;
+    --orange:#f59e0b;
+    --shadow:0 1px 2px rgba(28,42,69,.06), 0 6px 20px rgba(28,42,69,.07);
+    --label-w:178px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--bg); color:var(--navy); font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;}
+  button{font-family:inherit;}
+
+  /* ---------- Header ---------- */
+  header{
+    padding:34px 32px 18px;
+    display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px;
+  }
+  .titleblock h1{
+    font-family:'Archivo',sans-serif; font-weight:800; font-size:2rem; letter-spacing:-.02em; line-height:1.1;
+  }
+  .titleblock .sub{
+    font-family:'Archivo',sans-serif; font-weight:700; font-size:.8rem; letter-spacing:.18em;
+    color:var(--teal); text-transform:uppercase; margin-top:6px;
+  }
+  .controls{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+  .chip{
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:.75rem; font-weight:600; color:var(--navy-soft);
+    background:var(--card); border:1px solid var(--line); border-radius:99px; padding:7px 12px;
+  }
+  .chip .dot{width:8px; height:8px; border-radius:50%; background:#c3ccd9; flex:none;}
+  .chip.live .dot{background:var(--teal); box-shadow:0 0 0 3px rgba(14,148,136,.18);}
+  .chip.snapshot .dot{background:var(--orange); box-shadow:0 0 0 3px rgba(245,158,11,.18);}
+  .btn{
+    border:1px solid var(--line); background:var(--card); color:var(--navy);
+    border-radius:8px; padding:7px 12px; font-size:.78rem; font-weight:600; cursor:pointer;
+    transition:background .15s, border-color .15s;
+  }
+  .btn:hover{background:var(--teal-soft); border-color:var(--teal);}
+  .btn:focus-visible, .phase-seg:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+  .btn.primary{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .btn.primary:hover{background:#2a3b5f;}
+  .zoom{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--card);}
+  .zoom button{border:0; background:none; padding:7px 11px; font-size:.9rem; font-weight:700; color:var(--navy); cursor:pointer;}
+  .zoom button:hover{background:var(--teal-soft);}
+
+  /* ---------- Board ---------- */
+  .board-wrap{
+    margin:6px 32px 8px; background:var(--card); border:1px solid var(--line); border-radius:14px;
+    box-shadow:var(--shadow); overflow-x:auto; overflow-y:hidden; position:relative;
+  }
+  .board{position:relative;}
+
+  /* Phase ribbon: chevron segments encode the sequence */
+  .phase-band{position:relative; height:64px; margin-top:20px;}
+  .phase-seg{
+    position:absolute; top:10px; height:44px; border:0; cursor:pointer;
+    background:#eef2f8; color:var(--navy-soft);
+    font-family:'Archivo',sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
+    display:flex; align-items:center; justify-content:center; gap:8px; padding:0 24px 0 30px;
+    clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
+    transition:background .15s, color .15s;
+    white-space:nowrap; overflow:hidden;
+  }
+  .phase-seg:first-of-type{clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); border-radius:8px 0 0 8px;}
+  .phase-seg:hover{background:var(--teal-soft); color:var(--teal);}
+  .phase-seg.active{background:var(--navy); color:#fff;}
+  .phase-seg .badge{
+    font-family:'Archivo'; font-size:.62rem; background:rgba(28,42,69,.10); border-radius:99px; padding:2px 7px;
+  }
+  .phase-seg.active .badge{background:rgba(255,255,255,.18);}
+
+  /* Month axis */
+  .axis{position:relative; height:34px; border-bottom:1px solid var(--line);}
+  .tick{position:absolute; top:0; height:100%; border-left:1px solid var(--line);}
+  .tick span{
+    position:absolute; top:8px; left:8px; font-size:.68rem; font-weight:600; color:var(--muted); white-space:nowrap;
+  }
+  .tick.year span{color:var(--navy); font-weight:700;}
+
+  /* Lanes */
+  .lanes{position:relative; padding-bottom:22px;}
+  .lane{position:relative; border-bottom:1px dashed #e8edf4;}
+  .lane:last-child{border-bottom:0;}
+  .lane-label{
+    position:sticky; left:0; z-index:5; width:var(--label-w); height:100%;
+    display:flex; align-items:flex-start; padding:14px 14px 0 20px; float:left;
+    background:linear-gradient(90deg, var(--card) 82%, rgba(255,255,255,0));
+  }
+  .lane-label b{
+    font-family:'Archivo',sans-serif; font-size:.66rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--lane-color, var(--navy)); border:1.5px solid var(--lane-color, var(--navy));
+    padding:5px 9px; border-radius:6px; background:#fff; line-height:1.25;
+  }
+  .grid-line{position:absolute; top:0; bottom:0; border-left:1px solid #eef2f7; z-index:0;}
+
+  /* Event pills */
+  .evt{
+    position:absolute; height:27px; display:flex; align-items:center; gap:0;
+    background:#fff; border:1px solid var(--line); border-radius:7px;
+    box-shadow:0 1px 3px rgba(28,42,69,.10);
+    font-size:.72rem; font-weight:600; color:var(--navy);
+    padding:0 10px 0 0; cursor:default; white-space:nowrap; z-index:2;
+    transition:box-shadow .15s, transform .15s;
+  }
+  .evt:hover{box-shadow:0 3px 10px rgba(28,42,69,.18); transform:translateY(-1px); z-index:6;}
+  .evt::before{
+    content:''; width:4px; align-self:stretch; margin-right:8px; border-radius:7px 0 0 7px;
+    background:var(--evt-color, var(--navy));
+  }
+  .evt.range{
+    color:#fff; border:0; padding-right:12px;
+    background:linear-gradient(0deg, rgba(255,255,255,.08), rgba(255,255,255,.08)), var(--evt-color, var(--navy));
+  }
+  .evt.range::before{background:rgba(255,255,255,.35); margin-right:9px;}
+  .evt .dl{font-size:.62rem; font-weight:700; color:var(--orange); margin-left:6px;}
+
+  /* Today marker */
+  .today{position:absolute; top:0; bottom:0; width:0; border-left:2px solid var(--teal); z-index:4; pointer-events:none;}
+  .today em{
+    position:absolute; top:2px; left:-2px; transform:translateX(-50%);
+    background:var(--teal); color:#fff; font-style:normal; font-size:.6rem; font-weight:700; letter-spacing:.08em;
+    padding:2px 7px; border-radius:99px; text-transform:uppercase;
+  }
+
+  /* Tooltip */
+  .tip{
+    position:fixed; z-index:50; max-width:300px; background:var(--navy); color:#fff;
+    border-radius:10px; padding:12px 14px; font-size:.75rem; line-height:1.5;
+    box-shadow:0 10px 30px rgba(28,42,69,.35); pointer-events:none; display:none;
+  }
+  .tip b{font-size:.82rem; display:block; margin-bottom:3px;}
+  .tip .meta{color:#aebadd; font-size:.68rem; margin-bottom:6px;}
+  .tip .notes{color:#dfe6f5;}
+
+  /* Phase checklist panel */
+  .phase-panel{margin:0 32px 8px; display:none;}
+  .phase-panel.open{display:block;}
+  .phase-cards{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:12px;}
+  .phase-card{
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .phase-card h3{
+    font-family:'Archivo',sans-serif; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--navy); margin-bottom:4px;
+  }
+  .phase-card .range{font-size:.66rem; font-weight:600; color:var(--teal); margin-bottom:10px;}
+  .phase-card ul{list-style:none;}
+  .phase-card li{
+    font-size:.76rem; color:var(--navy-soft); padding:3px 0 3px 16px; position:relative; line-height:1.4;
+  }
+  .phase-card li::before{content:''; position:absolute; left:2px; top:.72em; width:5px; height:5px; border-radius:50%; background:var(--teal);}
+
+  /* Footer / how-to */
+  footer{padding:10px 32px 40px; color:var(--muted); font-size:.75rem;}
+  footer details{
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 18px; box-shadow:var(--shadow);
+  }
+  footer summary{cursor:pointer; font-weight:700; color:var(--navy); font-size:.8rem;}
+  footer .howto{margin-top:12px; line-height:1.7; max-width:860px;}
+  footer code{background:#eef2f8; border-radius:4px; padding:1px 6px; font-size:.72rem; color:var(--navy);}
+  footer table{border-collapse:collapse; margin:8px 0 12px;}
+  footer th, footer td{border:1px solid var(--line); padding:5px 10px; font-size:.72rem; text-align:left;}
+  footer th{background:#f2f5fa; color:var(--navy);}
+  .foot-note{margin-top:14px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+
+  .error-note{margin:0 32px 8px; padding:10px 16px; border-radius:10px; background:#fff7ed; border:1px solid #fbd9a5; color:#8a5a10; font-size:.75rem; display:none;}
+  .error-note.show{display:block;}
+
+  @media (max-width:640px){
+    header{padding:24px 16px 12px;}
+    .titleblock h1{font-size:1.4rem;}
+    .board-wrap, .phase-panel, .error-note{margin-left:12px; margin-right:12px;}
+    footer{padding:10px 16px 32px;}
+    :root{--label-w:120px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;}
+  }
+  @media print{
+    .controls, footer, .phase-panel{display:none !important;}
+    .board-wrap{overflow:visible; box-shadow:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="titleblock">
+    <h1>IP Mobilization Journey</h1>
+    <div class="sub">2025 – 2026 Operational Lifecycle</div>
+  </div>
+  <div class="controls">
+    <span id="statusChip" class="chip"><span class="dot"></span><span id="statusText">Loading…</span></span>
+    <span class="zoom" title="Zoom timeline">
+      <button id="zoomOut" aria-label="Zoom out">−</button>
+      <button id="zoomIn" aria-label="Zoom in">+</button>
+    </span>
+    <button class="btn" id="refreshBtn">Refresh data</button>
+    <button class="btn" id="allPhasesBtn">Phase guide</button>
+    <a class="btn primary" id="openSheet" href="#" target="_blank" rel="noopener">Open sheet</a>
+  </div>
+</header>
+
+<div class="error-note" id="errorNote"></div>
+
+<div class="phase-panel" id="phasePanel"><div class="phase-cards" id="phaseCards"></div></div>
+
+<div class="board-wrap" id="boardWrap">
+  <div class="board" id="board"></div>
+</div>
+
+<footer>
+  <details>
+    <summary>How this timeline stays up to date</summary>
+    <div class="howto">
+      <p>Each time this file is opened, it tries to pull live data from the team Google Sheet. If the sheet
+      can't be reached (offline, tab missing, or sharing turned off), it falls back to the snapshot embedded
+      in this file — so the page always renders.</p>
+      <p style="margin-top:10px"><strong>One-time sheet setup:</strong> in the Google Sheet, add a tab named
+      <code>Timeline</code>, make sure link-sharing is set to “Anyone with the link can view”, and give the tab
+      these column headers in row 1:</p>
+      <table>
+        <tr><th>Track</th><th>Event</th><th>Start Date</th><th>End Date</th><th>Phase</th><th>Notes</th></tr>
+        <tr><td>Internship</td><td>Mid Fundraise Check</td><td>2026-03-01</td><td></td><td>Preparation</td><td>3 months out — 50% raised target</td></tr>
+        <tr><td>Equip</td><td>Equip Intensive Program</td><td>2026-09-01</td><td>2026-09-30</td><td>On Field</td><td>Leave End Date blank for single-point events</td></tr>
+      </table>
+      <p>Dates are flexible: <code>2026-03-01</code>, <code>3/1/2026</code>, or <code>Mar 2026</code> all work.
+      An <em>End Date</em> turns the event into a colored duration bar; leaving it blank shows a point pill.
+      New track names automatically get their own swimlane and color.</p>
+      <p style="margin-top:10px">Use <strong>Copy sheet template</strong> below to copy the current data as
+      tab-separated rows — paste it straight into the new <code>Timeline</code> tab (cell A1) to get started.</p>
+      <div class="foot-note">
+        <button class="btn" id="copyTsv">Copy sheet template</button>
+        <span>Internal Operations Visual&nbsp;|&nbsp;Confidential</span>
+      </div>
+    </div>
+  </details>
+</footer>
+
+<div class="tip" id="tip"></div>
+
+<script>
+/* =====================================================================
+   CONFIG — the only section you normally need to touch
+   ===================================================================== */
+const CONFIG = {
+  sheetId: "1N4MaPS9GyLjoNTq9iHvqOjdurTHTYDHLtyAPthUcP4I",
+  sheetName: "Timeline",   // name of the flat data tab in the sheet
+  gid: null,               // optional: use the tab's gid instead of its name
+};
+
+/* Track display order + colors. Tracks found in the sheet but not listed
+   here are appended automatically with colors from EXTRA_COLORS. */
+const TRACKS = [
+  { name: "General Marketing",           color: "#3b82f6" },
+  { name: "Timothy Ambition / Seed Week", color: "#0e9488" },
+  { name: "Internship",                  color: "#22c55e" },
+  { name: "Equip",                       color: "#f59e0b" },
+];
+const EXTRA_COLORS = ["#8b5cf6","#ec4899","#06b6d4","#ef4444","#84cc16","#64748b"];
+
+/* Lifecycle phases: ribbon at the top + checklist cards. Edit freely. */
+const PHASES = [
+  { name:"Mobilization", start:"2025-09-01", end:"2025-12-31", items:[
+    "Church outreach","Marketing campaigns","Early Bird promotion","Program awareness"]},
+  { name:"Application", start:"2026-01-01", end:"2026-02-28", items:[
+    "Application submitted","Interviews","Acceptance","Background checks","Housing (Internship)"]},
+  { name:"Preparation", start:"2026-03-01", end:"2026-05-31", items:[
+    "Fundraising / Support Raising","Final Registration","Training Modules","Child Protection",
+    "Partnership Fees","Release Forms","Monthly check-ins"]},
+  { name:"On Field", start:"2026-06-01", end:"2026-08-31", items:[
+    "Program begins","Weekly surveys","Mid-program check-in","Staff support","Statistics reminder","Participant care"]},
+  { name:"Off Field", start:"2026-09-01", end:"2026-10-31", items:[
+    "Program ends","Debrief","Evaluations","Follow-up meetings","Church feedback","Partnership follow-up"]},
+  { name:"Alumni & Re-engagement", start:"2026-11-01", end:"2026-12-31", items:[
+    "Alumni Network","Invite to future programs","Regional Mobilizers","Church referrals",
+    "Recruit next participants","Early Bird begins again"]},
+];
+
+/* =====================================================================
+   FALLBACK SNAPSHOT — used only when the sheet can't be fetched.
+   Columns: Track | Event | Start | End | Phase | Notes
+   ===================================================================== */
+const FALLBACK = [
+["General Marketing","Campaign Launch","2025-09-01","","Mobilization","Kick off church outreach and marketing campaigns for the new cycle."],
+["General Marketing","Early Bird Promo","2026-02-01","","Application","Early Bird pricing push before final registration."],
+["General Marketing","Application Push","2026-08-01","","Off Field","Application push for the next cycle while stories are fresh."],
+["General Marketing","Alumni Stories","2026-12-01","","Alumni & Re-engagement","Publish alumni stories; feed recruitment for next year."],
+
+["Timothy Ambition / Seed Week","TA/SW Recruitment","2025-09-01","","Mobilization","Recruitment via churches; invite sending churches to bring a SW/TA."],
+["Timothy Ambition / Seed Week","TA/SW Applications","2026-01-05","","Application","Applications open; interviews and acceptance follow."],
+["Timothy Ambition / Seed Week","TA/SW Training","2026-05-01","","Preparation","Training modules; send reminders to TA/SW staff to keep stats."],
+["Timothy Ambition / Seed Week","TA/SW Program Deployment","2026-09-01","2026-09-30","On Field","Cohort deployment. Quarterly check-ins with Equip continue."],
+["Timothy Ambition / Seed Week","TA/SW Debrief","2026-12-01","","Alumni & Re-engagement","Debrief + evaluations; invite to bring a SW with their church next cycle."],
+
+["Internship","Intern Recruitment","2025-09-01","","Mobilization","Recruitment + intern housing conversations begin."],
+["Internship","Intern Applications","2026-01-05","","Application","Interviews, background checks, Bible test → Equip/Intern director + Kelly 16PF."],
+["Internship","Interviews & Checks","2026-02-01","","Application","Internship lodging confirmations once accepted."],
+["Internship","Mid Fundraise Check","2026-03-01","","Preparation","3 months before program — target ~50% raised."],
+["Internship","Full Payment Due","2026-04-15","","Preparation","April: full payment due (Internship)."],
+["Internship","Housing Setup","2026-05-01","","Preparation","Find a place; connect interns with local Christians early."],
+["Internship","Summer Internship Program","2026-06-15","2026-08-15","On Field","On field. Mid-program check-in; end-of-program debrief 1 week before close."],
+["Internship","Intern Evaluations","2026-12-01","","Alumni & Re-engagement","Send evaluation forms; ask for intern prospects; Mob presents programs."],
+
+["Equip","Equip Promotion","2025-09-01","","Mobilization","Promotion via churches and partners; invite a partner intern/Equipee."],
+["Equip","Equip Applications","2026-01-05","","Application","Applications, interviews, acceptance."],
+["Equip","Mid Fundraise Check","2026-03-01","","Preparation","3 months before — ~50% target; approved support schedule (Equip)."],
+["Equip","Equip Training","2026-05-01","","Preparation","Fundraising / cohort meetings ×3; connect with each other and Christians early."],
+["Equip","Payment Deadline","2026-06-03","","Preparation","Full payment deadline June 3 (Equip)."],
+["Equip","Equip Intensive Program","2026-09-01","2026-09-30","On Field","Intensive program window."],
+["Equip","Equip Follow-up","2026-12-01","","Alumni & Re-engagement","OFF Field debrief ~3 months after; cohort regional Mob invite; alumni network."],
+];
+
+/* ===================================================================== */
+
+const $ = (id) => document.getElementById(id);
+let MW = 110;                 // pixels per month (zoom)
+const LABEL_W = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-w'));
+let events = [];              // normalized {track,name,start,end,phase,notes}
+let dataSource = "snapshot";  // "live" | "snapshot"
+let openPhase = null;         // index of open phase card, or "all"
+
+/* ---------- date helpers ---------- */
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function parseDate(s){
+  if(!s) return null;
+  s = String(s).trim();
+  if(!s) return null;
+  let m;
+  if(m = s.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/))
+    return new Date(+m[1], +m[2]-1, +(m[3]||1));
+  if(m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/))
+    return new Date(+m[3] < 100 ? 2000 + +m[3] : +m[3], +m[1]-1, +m[2]);
+  if(m = s.match(/^(\d{1,2})\/(\d{4})$/))
+    return new Date(+m[2], +m[1]-1, 1);
+  if(m = s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})$/)){
+    const mi = MONTHS.findIndex(x => m[1].toLowerCase().startsWith(x.toLowerCase()));
+    if(mi >= 0) return new Date(+m[3], mi, +m[2]);
+  }
+  if(m = s.match(/^([A-Za-z]{3,9})\.?\s+(\d{4})$/)){
+    const mi = MONTHS.findIndex(x => m[1].toLowerCase().startsWith(x.toLowerCase()));
+    if(mi >= 0) return new Date(+m[2], mi, 1);
+  }
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+function fmt(d){ return d ? `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}` : ""; }
+function monthDiff(a, b){ // fractional months from a to b
+  return (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth())
+       + (b.getDate()-1)/new Date(b.getFullYear(), b.getMonth()+1, 0).getDate();
+}
+
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  const rows = [];
+  let row = [], cur = "", inQ = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(inQ){
+      if(c === '"'){ if(text[i+1] === '"'){ cur += '"'; i++; } else inQ = false; }
+      else cur += c;
+    } else {
+      if(c === '"') inQ = true;
+      else if(c === ',') { row.push(cur); cur = ""; }
+      else if(c === '\n'){ row.push(cur); rows.push(row); row = []; cur = ""; }
+      else if(c !== '\r') cur += c;
+    }
+  }
+  if(cur !== "" || row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+
+function normalizeRows(rows){
+  if(!rows.length) return [];
+  const head = rows[0].map(h => h.toLowerCase().trim());
+  const col = (names) => head.findIndex(h => names.some(n => h === n || h.startsWith(n)));
+  const iT = col(["track","lane","program"]), iE = col(["event","title","name"]),
+        iS = col(["start"]), iEn = col(["end"]), iP = col(["phase"]), iN = col(["note"]);
+  if(iT < 0 || iE < 0 || iS < 0) return []; // not our schema
+  const out = [];
+  for(let r = 1; r < rows.length; r++){
+    const row = rows[r];
+    const start = parseDate(row[iS]);
+    if(!row[iT] || !row[iE] || !start) continue;
+    out.push({
+      track: row[iT].trim(),
+      name: row[iE].trim(),
+      start,
+      end: iEn >= 0 ? parseDate(row[iEn]) : null,
+      phase: iP >= 0 ? (row[iP]||"").trim() : "",
+      notes: iN >= 0 ? (row[iN]||"").trim() : "",
+    });
+  }
+  return out;
+}
+
+function fallbackEvents(){
+  return FALLBACK.map(r => ({
+    track:r[0], name:r[1], start:parseDate(r[2]), end:parseDate(r[3]), phase:r[4], notes:r[5]
+  })).filter(e => e.start);
+}
+
+/* ---------- data loading ---------- */
+async function loadData(){
+  setStatus("loading");
+  const base = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv`;
+  const url = base + (CONFIG.gid != null ? `&gid=${CONFIG.gid}` : `&sheet=${encodeURIComponent(CONFIG.sheetName)}`);
+  try{
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 9000);
+    const res = await fetch(url, { signal: ctl.signal });
+    clearTimeout(timer);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    if(text.trim().startsWith("<")) throw new Error("Sheet is not shared publicly or tab not found");
+    const parsed = normalizeRows(parseCSV(text));
+    if(!parsed.length) throw new Error(`No usable rows in the “${CONFIG.sheetName}” tab (check the column headers)`);
+    events = parsed;
+    dataSource = "live";
+    $("errorNote").classList.remove("show");
+  } catch(err){
+    events = fallbackEvents();
+    dataSource = "snapshot";
+    const note = $("errorNote");
+    note.textContent = `Couldn't load live data from the Google Sheet (${err.message}). Showing the snapshot embedded in this file instead. ` +
+      `To go live: add a “${CONFIG.sheetName}” tab with the schema described under “How this timeline stays up to date”, and set sharing to “Anyone with the link can view”.`;
+    note.classList.add("show");
+  }
+  setStatus(dataSource);
+  render();
+}
+
+function setStatus(state){
+  const chip = $("statusChip"), txt = $("statusText");
+  chip.className = "chip";
+  if(state === "loading"){ txt.textContent = "Loading…"; return; }
+  const t = new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  if(state === "live"){ chip.classList.add("live"); txt.textContent = `Live from Google Sheets · ${t}`; }
+  else { chip.classList.add("snapshot"); txt.textContent = `Embedded snapshot · ${t}`; }
+}
+
+/* ---------- rendering ---------- */
+function trackList(){
+  const known = TRACKS.map(t => t.name);
+  const seen = [...new Set(events.map(e => e.track))];
+  const list = TRACKS.filter(t => seen.includes(t.name))
+    .concat(seen.filter(n => !known.includes(n))
+    .map((n, i) => ({ name:n, color: EXTRA_COLORS[i % EXTRA_COLORS.length] })));
+  return list;
+}
+
+function render(){
+  const board = $("board");
+  board.innerHTML = "";
+  if(!events.length){ board.innerHTML = "<p style='padding:40px'>No events to show.</p>"; return; }
+
+  // Timeline bounds: snap to month start/end across events + phases
+  const dates = events.flatMap(e => [e.start, e.end || e.start])
+    .concat(PHASES.flatMap(p => [parseDate(p.start), parseDate(p.end)])).filter(Boolean);
+  const min = new Date(Math.min(...dates)), max = new Date(Math.max(...dates));
+  const t0 = new Date(min.getFullYear(), min.getMonth(), 1);
+  const t1 = new Date(max.getFullYear(), max.getMonth() + 1, 1);
+  const nMonths = (t1.getFullYear()-t0.getFullYear())*12 + (t1.getMonth()-t0.getMonth());
+  const X = (d) => LABEL_W() + monthDiff(t0, d) * MW;
+  const totalW = LABEL_W() + nMonths * MW + 40;
+  board.style.width = totalW + "px";
+
+  /* Phase ribbon */
+  const band = document.createElement("div");
+  band.className = "phase-band";
+  PHASES.forEach((p, i) => {
+    const s = parseDate(p.start), e = parseDate(p.end);
+    if(!s || !e) return;
+    const seg = document.createElement("button");
+    seg.className = "phase-seg" + (openPhase === i ? " active" : "");
+    seg.style.left = X(s) + "px";
+    seg.style.width = Math.max(60, X(e) - X(s)) + "px";
+    seg.innerHTML = `<span>${p.name}</span><span class="badge">${p.items.length}</span>`;
+    seg.title = `${p.name} — click for checklist`;
+    seg.addEventListener("click", () => togglePhase(i));
+    band.appendChild(seg);
+  });
+  board.appendChild(band);
+
+  /* Month axis */
+  const axis = document.createElement("div");
+  axis.className = "axis";
+  for(let i = 0; i < nMonths; i++){
+    const d = new Date(t0.getFullYear(), t0.getMonth() + i, 1);
+    const tick = document.createElement("div");
+    tick.className = "tick" + (d.getMonth() === 0 || i === 0 ? " year" : "");
+    tick.style.left = X(d) + "px";
+    tick.innerHTML = `<span>${MONTHS[d.getMonth()]}${(d.getMonth() === 0 || i === 0) ? " " + d.getFullYear() : ""}</span>`;
+    axis.appendChild(tick);
+  }
+  board.appendChild(axis);
+
+  /* Lanes */
+  const lanes = document.createElement("div");
+  lanes.className = "lanes";
+  const ROW_H = 37, PAD_T = 12, PAD_B = 14;
+
+  trackList().forEach(tr => {
+    const laneEvents = events.filter(e => e.track === tr.name)
+      .sort((a,b) => a.start - b.start);
+
+    // assign sub-rows to avoid overlaps (estimate pill width from label length)
+    const sub = [];
+    laneEvents.forEach(e => {
+      const x1 = X(e.start);
+      const w = e.end ? Math.max(X(e.end) - x1, 90) : Math.max(7.2 * e.name.length + 34, 70);
+      e._x = x1; e._w = w;
+      let r = 0;
+      while(sub[r] !== undefined && sub[r] > x1 - 8) r++;
+      sub[r] = x1 + w;
+      e._row = r;
+    });
+    const rows = Math.max(sub.length, 1);
+
+    const lane = document.createElement("div");
+    lane.className = "lane";
+    lane.style.height = (PAD_T + rows * ROW_H + PAD_B) + "px";
+    lane.style.setProperty("--lane-color", tr.color);
+
+    // month grid lines
+    for(let i = 0; i <= nMonths; i++){
+      const g = document.createElement("div");
+      g.className = "grid-line";
+      g.style.left = (LABEL_W() + i * MW) + "px";
+      lane.appendChild(g);
+    }
+
+    const label = document.createElement("div");
+    label.className = "lane-label";
+    label.innerHTML = `<b>${tr.name}</b>`;
+    lane.appendChild(label);
+
+    laneEvents.forEach(e => {
+      const el = document.createElement("div");
+      el.className = "evt" + (e.end ? " range" : "");
+      el.style.setProperty("--evt-color", tr.color);
+      el.style.left = e._x + "px";
+      el.style.top = (PAD_T + e._row * ROW_H) + "px";
+      if(e.end) el.style.width = e._w + "px";
+      el.textContent = e.name;
+      el.addEventListener("mousemove", (ev) => showTip(ev, e, tr.color));
+      el.addEventListener("mouseleave", hideTip);
+      lane.appendChild(el);
+    });
+    lanes.appendChild(lane);
+  });
+  board.appendChild(lanes);
+
+  /* Today marker */
+  const now = new Date();
+  if(now >= t0 && now <= t1){
+    const today = document.createElement("div");
+    today.className = "today";
+    today.style.left = X(now) + "px";
+    today.innerHTML = "<em>Today</em>";
+    lanes.style.position = "relative";
+    lanes.appendChild(today);
+  }
+
+  renderPhasePanel();
+}
+
+/* ---------- phase checklist panel ---------- */
+function togglePhase(i){
+  openPhase = (openPhase === i) ? null : i;
+  render();
+  if(openPhase !== null) $("phasePanel").scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+function renderPhasePanel(){
+  const panel = $("phasePanel"), cards = $("phaseCards");
+  cards.innerHTML = "";
+  const list = openPhase === "all" ? PHASES.map((_, i) => i) : (openPhase === null ? [] : [openPhase]);
+  list.forEach(i => {
+    const p = PHASES[i];
+    const c = document.createElement("div");
+    c.className = "phase-card";
+    c.innerHTML = `<h3>${p.name}</h3>
+      <div class="range">${fmt(parseDate(p.start))} → ${fmt(parseDate(p.end))}</div>
+      <ul>${p.items.map(x => `<li>${x}</li>`).join("")}</ul>`;
+    cards.appendChild(c);
+  });
+  panel.classList.toggle("open", list.length > 0);
+}
+
+/* ---------- tooltip ---------- */
+function showTip(ev, e, color){
+  const tip = $("tip");
+  const dates = e.end ? `${fmt(e.start)} → ${fmt(e.end)}` : fmt(e.start);
+  tip.innerHTML = `<b>${e.name}</b>
+    <div class="meta">${e.track}${e.phase ? " · " + e.phase : ""}<br>${dates}</div>
+    ${e.notes ? `<div class="notes">${e.notes}</div>` : ""}`;
+  tip.style.display = "block";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if(x + w > innerWidth - 10) x = ev.clientX - w - 14;
+  if(y + h > innerHeight - 10) y = ev.clientY - h - 14;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+function hideTip(){ $("tip").style.display = "none"; }
+
+/* ---------- controls ---------- */
+$("refreshBtn").addEventListener("click", loadData);
+$("zoomIn").addEventListener("click", () => { MW = Math.min(MW + 20, 240); render(); });
+$("zoomOut").addEventListener("click", () => { MW = Math.max(MW - 20, 60); render(); });
+$("allPhasesBtn").addEventListener("click", () => {
+  openPhase = (openPhase === "all") ? null : "all";
+  render();
+});
+$("openSheet").href = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/edit`;
+$("copyTsv").addEventListener("click", async (ev) => {
+  const head = "Track\tEvent\tStart Date\tEnd Date\tPhase\tNotes";
+  const body = events.map(e =>
+    [e.track, e.name,
+     `${e.start.getFullYear()}-${String(e.start.getMonth()+1).padStart(2,"0")}-${String(e.start.getDate()).padStart(2,"0")}`,
+     e.end ? `${e.end.getFullYear()}-${String(e.end.getMonth()+1).padStart(2,"0")}-${String(e.end.getDate()).padStart(2,"0")}` : "",
+     e.phase, e.notes].join("\t")).join("\n");
+  const tsv = head + "\n" + body;
+  try{ await navigator.clipboard.writeText(tsv); ev.target.textContent = "Copied — paste into cell A1"; }
+  catch{
+    const ta = document.createElement("textarea");
+    ta.value = tsv; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); ta.remove();
+    ev.target.textContent = "Copied — paste into cell A1";
+  }
+  setTimeout(() => ev.target.textContent = "Copy sheet template", 2600);
+});
+
+loadData();
+</script>
+</body>
+</html>
